@@ -1,0 +1,141 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>gov.nasa.arc.mct</groupId>
+  <artifactId>mct-scenario</artifactId>
+  <packaging>pom</packaging>
+  <name>MCT Packaging for Scenario Evaluation</name>
+  <version>${mct.platform.version}</version>
+  
+  <properties>
+    <platform.relativePath>../../mct</platform.relativePath>
+  </properties>
+  
+  <parent>
+  	<artifactId>mct-superpom</artifactId>
+  	<groupId>mct</groupId>
+  	<version>2.0.1</version>
+  	<relativePath>../../mct/superpom</relativePath>
+  </parent>
+  
+  <build>
+  	<extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-beta-2</version>
+      </extension>
+    </extensions>
+  	<plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-platform</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>unpack</goal>
+                </goals>
+                <configuration>
+                    <outputDirectory>
+                        ${project.build.directory}/platform.dir
+                    </outputDirectory>
+                    <artifactItems>
+                      <artifactItem>
+                        <groupId>gov.nasa.arc.mct</groupId>
+                        <artifactId>mct-platform</artifactId>
+                        <version>${mct.platform.version}</version>
+                        <classifier>dist</classifier>
+                        <type>tar.gz</type>
+                        <outputDirectory />
+                      </artifactItem>
+                    </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+
+		</plugin>	
+        
+        <plugin>
+           <groupId>com.google.code.maven-replacer-plugin</groupId>
+           <artifactId>replacer</artifactId>
+           <version>1.5.2</version>
+           <executions>
+               <execution>
+                   <phase>package</phase>
+                   <goals>
+                       <goal>replace</goal>
+                   </goals>                   
+               </execution>
+           </executions>
+           <configuration>
+               <file>${project.build.directory}/platform.dir/mct-platform-${mct.platform.version}/resources/properties/persistence.properties</file>
+               <replacements>
+                   <replacement>
+                       <token>mct.database_connectionUrl=.*</token>
+                       <value>mct.database_connectionUrl=jdbc\:mysql\://${mct.db.host}\\:${mct.db.port}/</value>
+                   </replacement>
+                   <replacement>
+                       <token>mct.database_name=.*</token>
+                       <value>mct.database_name=${mct.db.name}</value>
+                   </replacement>                  
+                   <replacement>
+                       <token>mct.database_userName=.*</token>
+                       <value>mct.database_userName=${mct.db.user}</value>
+                   </replacement>         
+                   <replacement>
+                       <token>mct.database_password=.*</token>
+                       <value>mct.database_password=${mct.db.password}</value>
+                   </replacement>                                               
+               </replacements>
+           </configuration>
+       </plugin>
+        
+        <plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-assembly-plugin</artifactId>
+  			<version>2.2-beta-5</version>
+  			<executions>
+                
+                <execution>
+	            	<id>dist</id>
+						<phase>package</phase>
+	            	<goals>
+	              		<goal>single</goal>
+	            	</goals>
+	            	<configuration>
+		              	<descriptors>
+		                	<descriptor>src/dist.xml</descriptor>
+		              	</descriptors>
+					</configuration>
+				</execution>
+                
+			</executions>
+		</plugin>	
+
+
+
+  	</plugins>  	
+  </build>
+  
+  <modules>
+    <module>../scenario</module>
+  </modules>
+  
+  <dependencies>
+    <dependency>
+  		<groupId>gov.nasa.arc.mct</groupId>
+  		<artifactId>mct-platform</artifactId>
+  		<version>${mct.platform.version}</version>
+        <classifier>dist</classifier>
+        <type>tar.gz</type>
+  	</dependency>    
+    
+    <dependency>
+  		<groupId>gov.nasa.arc.mct</groupId>
+  		<artifactId>scenario</artifactId>
+  		<version>${mct.platform.version}</version>
+  	</dependency>
+  </dependencies>
+</project>

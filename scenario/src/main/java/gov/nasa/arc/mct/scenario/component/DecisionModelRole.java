@@ -5,17 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * The <code>ExampleModelRole</code> provides a model.  This model can contain an arbitrary complex data structure. 
- * The data contents of the model are persisted by marshalling the model into XML text. 
- * See JavaTM Architecture for XML Binding Reference Implementation (RI) Version: 1.0.5. 
- * 
- * The JAXB annotations specify which parts of the model are persisted.  The XmlRootElement is required, as
- * it specifies the top level java binding to the root XML element.
- * 
- * In this example XmlAccessorType specifies that all fields (public or private) should be marshalled (ie serialized).
- * 
- * @author chris.webster@nasa.gov
- *
+ * Container for an Decision's model.
+ * TODO: Should this class be omitted? Can't DecisionComponent just reference DecisionData instead?
  */
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)

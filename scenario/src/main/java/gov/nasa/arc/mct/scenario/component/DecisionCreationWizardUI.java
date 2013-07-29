@@ -1,6 +1,7 @@
 package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.scenario.util.DurationFormatter;
 import gov.nasa.arc.mct.services.component.ComponentRegistry;
 import gov.nasa.arc.mct.services.component.CreateWizardUI;
 import gov.nasa.arc.mct.util.DataValidation;
@@ -12,6 +13,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -24,6 +26,12 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+/**
+ * The Creation dialog box for Decision components.
+ * 
+ * Contains fields to specify activity start time and duration.
+ * 
+ */
 public class DecisionCreationWizardUI  extends CreateWizardUI {
 
 	private static final ResourceBundle bundle ;
@@ -44,6 +52,8 @@ public class DecisionCreationWizardUI  extends CreateWizardUI {
 	
 	private final JLabel message = new JLabel();
     private final JTextField name = new JTextField();
+    private final JTextField startTime = new JTextField("00:00");
+    private final JTextField duration = new JTextField("01:00");
     private Class<? extends AbstractComponent> componentClass;
 	
 	public DecisionCreationWizardUI() {
@@ -60,10 +70,27 @@ public class DecisionCreationWizardUI  extends CreateWizardUI {
 		component.setDisplayName(displayName);
 		DecisionComponent decisionComponent = (DecisionComponent) component;
 		DecisionData data = decisionComponent.getData();
-		Date currentTime = Calendar.getInstance().getTime();
-		data.setStartDate(currentTime);
-		data.setEndDate(currentTime);
+		
+		Date startDate, endDate;
+		try {
+			startDate = new Date(DurationFormatter.parse(startTime.getText()));
+			endDate = new Date(startDate.getTime() + DurationFormatter.parse(duration.getText())); 
+		} catch (ParseException e) {
+			startDate = new Date(0L);
+			endDate = new Date(30L * 60L * 1000L);
+		}
+		data.setStartDate(startDate);
+		data.setEndDate(endDate);
 		component.save();
+
+		if (targetComponent instanceof ActivityComponent) {
+			//TODO - this should be handled by addDelegateComponentsCallback 
+			//       in ActivityComponent, but at the time this is called 
+			//       (comp.newInstance above) there is still no 
+			//       time data associated with this component
+			((ActivityComponent) targetComponent).constrainChildren(decisionComponent, false);
+			((ActivityComponent) targetComponent).constrainChildren(decisionComponent, true);
+		}
         
         return component;
 	}
@@ -137,9 +164,33 @@ public class DecisionCreationWizardUI  extends CreateWizardUI {
 		c.weightx = 1;
 		c.gridwidth = 2;
 		c.insets = new Insets(0,10,0,10);
-	        
+
 		c.gridx = 0;
 		c.gridy = 2;
+		c.weightx = 1;
+		c.gridwidth = 2;
+		UIPanel.add(new JLabel("Start:"),c);
+		
+		c.gridx = 1;
+		c.gridy = 2;
+		c.weightx = 1;
+		c.gridwidth = 2;
+		UIPanel.add(startTime,c);
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		c.weightx = 1;
+		c.gridwidth = 2;
+		UIPanel.add(new JLabel("Duration:"),c);
+		
+		c.gridx = 1;
+		c.gridy = 3;
+		c.weightx = 1;
+		c.gridwidth = 2;
+		UIPanel.add(duration,c);
+		
+		c.gridx = 0;
+		c.gridy = 4;
 		c.weightx = 1;
 		c.gridwidth = 2;
 		UIPanel.add(messagePanel,c);

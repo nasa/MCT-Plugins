@@ -1,31 +1,26 @@
 package gov.nasa.arc.mct.scenario.component;
-
 import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.components.PropertyEditor;
-import gov.nasa.arc.mct.scenario.util.DurationFormatter;
 
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
+
 /**
- * Property editor to support specification of a Decision's end time in the Info View.
+ * Property editor to support specification of an Activity's communications cost in the Info View.
  *
  */
-public final class DecisionEndTimePropertyEditor implements PropertyEditor<Object> {
-	private DecisionComponent decisionComponent = null;
+public final class TypePropertyEditor implements PropertyEditor<Object> {
 
-	public DecisionEndTimePropertyEditor(AbstractComponent component) {
-		decisionComponent = (DecisionComponent)component;
+	ActivityComponent activityComponent = null;
+
+	public TypePropertyEditor(AbstractComponent component) {
+		activityComponent = (ActivityComponent)component;
 	}
 
 	@Override
 	public String getAsText() {
-		Date endDate = decisionComponent.getModel().getData().getEndTime();
-		if (endDate == null)
-			endDate = Calendar.getInstance().getTime();
-		return DurationFormatter.formatDuration(endDate.getTime());//String.valueOf(FORMATTER.format(startDate));
+		String typeData = activityComponent.getModel().getData().getActivityType();
+		return typeData;
 	}
 
 	/**
@@ -38,30 +33,25 @@ public final class DecisionEndTimePropertyEditor implements PropertyEditor<Objec
 	@Override
 	public void setAsText(String newValue) throws IllegalArgumentException {
 		String result = verify(newValue);
-		if (result != null) {
+		if (verify(newValue) != null) {
 			throw new IllegalArgumentException(result);
 		}
-		DecisionData businessModel = decisionComponent.getModel().getData();
-		Date parsedDate = null;
-		try {
-			parsedDate = new Date( DurationFormatter.parse(newValue) );			
-		} catch (ParseException e) {
-			// Format verified in verify()
-		}
-		businessModel.setEndDate(parsedDate);
+			ActivityData businessModel = activityComponent.getModel().getData();
+			businessModel.setActivityType(newValue);
+			
 	}
 
+	@SuppressWarnings("unused")
 	private String verify(String s) {
 		assert s != null;
 		if (s.isEmpty()) {
 			return "Cannot be unspecified";
 		}
-		try {
+		/*try { // add a test if only certain types / type format is permitted
 			DurationFormatter.parse(s);
 		} catch (ParseException e) {
-			return "Date formatter error";
-		}
-
+			return "Duration incorrectly formatted. See Scenario Plug-in Documentation";
+		}*/
 		return null;
 	}
 
@@ -80,3 +70,4 @@ public final class DecisionEndTimePropertyEditor implements PropertyEditor<Objec
 		throw new UnsupportedOperationException();
 	}
 } 
+

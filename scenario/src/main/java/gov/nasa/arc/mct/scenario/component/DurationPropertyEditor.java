@@ -2,10 +2,15 @@ package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.components.PropertyEditor;
+import gov.nasa.arc.mct.scenario.util.DurationFormatter;
 
+import java.text.ParseException;
 import java.util.List;
 
-
+/**
+ * Property editor to support specification of an Activity's duration in the Info View.
+ *
+ */
 public final class DurationPropertyEditor implements PropertyEditor<Object> {
 	ActivityComponent activityComponent = null;
 
@@ -15,9 +20,8 @@ public final class DurationPropertyEditor implements PropertyEditor<Object> {
 
 	@Override
 	public String getAsText() {
-//		double numericData = activityComponent.getModel().getData().getDuration();
-//		return String.valueOf(numericData);
-		return null;
+		String numericData = DurationFormatter.formatDuration(activityComponent.getModel().getData().getDurationTime());
+		return numericData;
 	}
 
 	/**
@@ -29,25 +33,27 @@ public final class DurationPropertyEditor implements PropertyEditor<Object> {
 	 */
 	@Override
 	public void setAsText(String newValue) throws IllegalArgumentException {
-//		String result = verify(newValue);
-//		if (verify(newValue) != null) {
-//			throw new IllegalArgumentException(result);
-//		}
-//		ActivityData businessModel = activityComponent.getModel().getData();
-//		double d = Double.parseDouble(newValue); // verify() took care of a possible number format exception
-//		businessModel.setDuration(d);
+		String result = verify(newValue);
+		if (verify(newValue) != null) {
+			throw new IllegalArgumentException(result);
+		}
+		ActivityData businessModel = activityComponent.getModel().getData();
+		try {
+			businessModel.setDurationTime(DurationFormatter.parse(newValue));
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Invalid date entered as text", e);
+		}			
 	}
 
-	@SuppressWarnings("unused")
 	private String verify(String s) {
 		assert s != null;
 		if (s.isEmpty()) {
 			return "Cannot be unspecified";
 		}
 		try {
-			Double.parseDouble(s);
-		} catch (NumberFormatException e) {
-			return "Must be a numeric";
+			DurationFormatter.parse(s);
+		} catch (ParseException e) {
+			return "Duration incorrectly formatted. See Scenario Plug-in Documentation";
 		}
 		return null;
 	}

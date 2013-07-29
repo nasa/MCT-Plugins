@@ -5,7 +5,10 @@ import gov.nasa.arc.mct.components.PropertyEditor;
 
 import java.util.List;
 
-
+/**
+ * Property editor to support specification of an Activity's communications cost in the Info View.
+ *
+ */
 public final class CommPropertyEditor implements PropertyEditor<Object> {
 	ActivityComponent activityComponent = null;
 
