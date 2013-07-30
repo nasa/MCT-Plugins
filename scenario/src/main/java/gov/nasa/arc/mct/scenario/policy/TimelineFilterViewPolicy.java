@@ -30,8 +30,10 @@ import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.scenario.component.TimelineComponent;
 import gov.nasa.arc.mct.scenario.view.AbstractTimelineView;
 import gov.nasa.arc.mct.scenario.view.GraphView;
+import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.ViewInfo;
+import gov.nasa.arc.mct.services.component.ViewType;
 
 /**
  * Policy controlling where timeline views are available. Prevents these views from 
@@ -70,8 +72,26 @@ public class TimelineFilterViewPolicy implements Policy  {
 				return new ExecutionResult(context, false, 
 						viewInfo.getViewName() + " only valid for Timeline objects.");
 			}
-		}		
-		
+		}
+		if (viewInfo.getViewType() == ViewType.CENTER_OWNED_INSPECTOR) {
+			if (targetComponent instanceof TimelineComponent &&
+				!TimelineInspector.class.isAssignableFrom(viewInfo.getViewClass())) {
+				return new ExecutionResult(context, false, 
+						"Timeline Inspector should pair with Timeline components");					
+			}
+			if (!(targetComponent instanceof TimelineComponent) &&
+				TimelineInspector.class.isAssignableFrom(viewInfo.getViewClass())) {
+					return new ExecutionResult(context, false, 
+							"Timeline Inspector should pair with Timeline components");					
+			}
+		}
+		if (targetComponent instanceof TimelineComponent &&
+			(viewInfo.getViewType() == ViewType.OBJECT || viewInfo.getViewType() == ViewType.CENTER) &&
+			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
+			// TODO: Probably also want Info view
+			return new ExecutionResult(context, false, 
+					"Timeline components support only Timeline views");
+		}
 		return trueResult;
 	}
 

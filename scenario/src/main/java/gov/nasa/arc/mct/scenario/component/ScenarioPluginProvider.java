@@ -2,6 +2,7 @@ package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.policy.PolicyInfo;
 import gov.nasa.arc.mct.scenario.policy.TimelineFilterViewPolicy;
+import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.AbstractComponentProvider;
 import gov.nasa.arc.mct.services.component.ComponentTypeInfo;
@@ -83,6 +84,7 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 		// TimelineFilterViewPolicy will suppress these as appropriate
 		return Arrays.asList(					
 				    new ViewInfo(TimelineView.class, "Timeline", ViewType.CENTER),
+				    new ViewInfo(TimelineInspector.class, "Timeline Inspector", ViewType.CENTER_OWNED_INSPECTOR),
 					new ViewInfo(TimelineView.class, "Timeline", ViewType.OBJECT));
 //					new ViewInfo(GraphView.class, "Cost Graph", ViewType.OBJECT),
 //					new ViewInfo(GraphView.class, "Cost Graph", ViewType.CENTER));

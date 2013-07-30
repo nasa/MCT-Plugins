@@ -48,6 +48,12 @@ public class ActivityView extends View implements CostOverlay {
 		setOpaque(false);
 	}
 	
+	@Override
+	public void updateMonitoredGUI() {
+		revalidate();
+		repaint();
+	}
+	
 	public void paintComponent(Graphics g) {
 		if (g instanceof Graphics2D) {
 			Graphics2D g2 = (Graphics2D) g;

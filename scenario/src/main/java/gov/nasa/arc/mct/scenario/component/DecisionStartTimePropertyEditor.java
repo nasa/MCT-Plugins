@@ -43,13 +43,15 @@ public final class DecisionStartTimePropertyEditor implements PropertyEditor<Obj
 			throw new IllegalArgumentException(result);
 		}
 		DecisionData businessModel = decisionComponent.getModel().getData();
-		Date parsedDate = null;
+		Date parsedDate = null;		
 		try {
 			parsedDate = new Date( DurationFormatter.parse(newValue) );			
 		} catch (ParseException e) {
 			// Format verified in verify()
 		}
+		long duration = businessModel.getEndTime().getTime() - businessModel.getStartTime().getTime();
 		businessModel.setStartDate(parsedDate);
+		businessModel.setEndDate(new Date(parsedDate.getTime() + duration)); // Maintain consistent duration
 	}
 
 	private String verify(String s) {

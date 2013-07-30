@@ -22,9 +22,13 @@
 package gov.nasa.arc.mct.scenario.view;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.gui.SelectionProvider;
 import gov.nasa.arc.mct.gui.View;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
@@ -46,6 +50,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 public abstract class AbstractTimelineView extends View implements ChangeListener {
+
+
 	private static final long serialVersionUID = -5683099761127087080L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTimelineView.class);
 	
@@ -65,6 +71,13 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 			LOGGER.warn(getClass().getName() + " instantiated for component without DurationCapability. " +
 					"This should have been prevented by policy. Subsequent errors anticipated.");
 		}
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				select(null); // IF a click makes it here, de-select!
+			}			
+		});
 	}
 	
 	/**
@@ -116,6 +129,11 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 		return timelineContainer.getRightPadding();
 	}
 	
+	@Override
+	public boolean isContentOwner() {
+		return true;
+	}
+	
 
 	/**
 	 * Get the component in which content can be placed. In practice, 
@@ -134,5 +152,13 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 		repaint();
 	}
 	
+	@Override
+	public SelectionProvider getSelectionProvider() {
+		return timelineContainer;
+	}
+	
+	public void select(View view) {
+		timelineContainer.select(view);
+	}
 	
 }

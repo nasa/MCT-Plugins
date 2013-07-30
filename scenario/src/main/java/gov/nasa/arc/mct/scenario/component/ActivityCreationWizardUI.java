@@ -78,7 +78,7 @@ public class ActivityCreationWizardUI  extends CreateWizardUI {
 			startDate = new Date(0L);
 			endDate = new Date(30L * 60L * 1000L);
 		}
-		data.setActivityType("enter activity type here");
+		data.setActivityType(""); // Default to empty type description
 		data.setStartDate(startDate);
 		data.setEndDate(endDate);
 		data.setPower(0);

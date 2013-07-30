@@ -154,14 +154,14 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 	
 	public void setType(String type) {
 		getData().setActivityType(type);
-		save();
+		//save();
 	}
 
 	@Override
 	public void setStart(long start) {
 		long old = getStart();
 		getData().setStartDate(new Date(start));
-		save();		
+		//save();		
 		if (old < start) {
 			constrainToDuration();
 		}
@@ -171,7 +171,7 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 	public void setEnd(long end) {
 		long old = getEnd();
 		getData().setEndDate(new Date(end));
-		save();
+		//save();
 		if (old > end) {
 			constrainToDuration();
 		}

@@ -23,9 +23,11 @@ package gov.nasa.arc.mct.scenario.view;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.gui.View;
+import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 import gov.nasa.arc.mct.scenario.component.ActivityComponent;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
+import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -69,7 +71,9 @@ public class TimelineView extends AbstractTimelineView {
 	
 	
 	public TimelineView(AbstractComponent ac, ViewInfo vi) {
-		super(ac,vi);
+		// Work with a clone, so that children pulled out using getComponents are all local versions
+		// This supports synchronization of Inspector with views in the Timeline
+		super(ac=PlatformAccess.getPlatform().getPersistenceProvider().getComponent(ac.getComponentId()),vi);
 		
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(upperPanel, BorderLayout.NORTH);
@@ -78,7 +82,7 @@ public class TimelineView extends AbstractTimelineView {
 		upperPanel.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
 		
 		getContentPane().setBackground(backgroundColor);
-		
+				
 		// Add all children
 		for (AbstractComponent child : ac.getComponents()) {
 			addTopLevelActivity(child);//addActivities(child, 0, new HashSet<String>());
@@ -136,8 +140,10 @@ public class TimelineView extends AbstractTimelineView {
 	}
 
 	private void addActivities(AbstractComponent ac, AbstractComponent parent, int depth, Set<String> ids, TimelineBlock block) {
-		DurationCapability dc = ac.getCapability(DurationCapability.class);
+		DurationCapability dc = ac.getCapability(DurationCapability.class);		
 		if (dc != null && !ids.contains(ac.getComponentId())) {
+			// Using workunitdelegate means these views will sync with inspector
+			ac.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
 			addViewToRow(dc, ac, (ActivityComponent) (parent instanceof ActivityComponent ? parent : null), block, depth);
 			ids.add(ac.getComponentId()); // Prevent infinite loops in case of cycle
 			for (AbstractComponent child : ac.getComponents()) {
@@ -153,7 +159,9 @@ public class TimelineView extends AbstractTimelineView {
 			block.add(block.rows.get(block.rows.size() - 1));
 			block.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
 		}
+
 		View activityView = ActivityView.VIEW_INFO.createView(ac);
+		
 		MouseAdapter controller = new TimelineDurationController(parent, dc, this);
 		block.rows.get(row).add(activityView, dc);
 		activityView.addMouseListener(controller);
