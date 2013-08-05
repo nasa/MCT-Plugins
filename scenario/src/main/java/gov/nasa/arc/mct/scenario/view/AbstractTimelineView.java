@@ -60,7 +60,7 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 	
 	public AbstractTimelineView(AbstractComponent ac, ViewInfo vi) {
 		super(ac,vi);
-		
+		setOpaque(false);
 		// Configure based on DurationCapability
 		DurationCapability dc = ac.getCapability(DurationCapability.class) ;
 		if (dc != null) {

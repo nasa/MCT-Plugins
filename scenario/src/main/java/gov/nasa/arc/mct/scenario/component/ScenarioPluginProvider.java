@@ -2,6 +2,7 @@ package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.policy.PolicyInfo;
 import gov.nasa.arc.mct.scenario.policy.TimelineFilterViewPolicy;
+import gov.nasa.arc.mct.scenario.view.ScenarioView;
 import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.AbstractComponentProvider;
@@ -40,6 +41,12 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			bundle.getString("display_name_timeline"),  
 			bundle.getString("description_timeline"), 
 			TimelineComponent.class);
+
+	// TODO: Expose this & scenario view to MCT
+	private static final ComponentTypeInfo scenarioComponentType = new ComponentTypeInfo(
+			bundle.getString("display_name_scenario"),  
+			bundle.getString("description_scenario"), 
+			ScenarioComponent.class);
 	
 	private static final PolicyInfo timelinePolicy = new PolicyInfo(
 			PolicyInfo.CategoryType.FILTER_VIEW_ROLE.getKey(), 
@@ -48,7 +55,7 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
 		// return the component types provided
-		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType);
+		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType /*, scenarioComponentType */ );
 	}
 
 	@Override
@@ -58,37 +65,15 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 		// for every component type so a view could be supplied for any component type not just
 		// components supplied by this provider.
 		
-		// Also, note that the default node view, canvas view, and housing view will be supplied
-		// by the MCT platform.
-//		if (componentTypeId.equals(ActivityComponent.class.getName())) {
-//			return Arrays.asList(
-//					new ViewInfo(TimelineRowView.class, "New Timeline", ViewType.CENTER),
-//					new ViewInfo(TimelineRowView.class, "New Timeline", ViewType.OBJECT),
-//					new ViewInfo(GraphView.class, "Cost Graph", ViewType.OBJECT),
-//					new ViewInfo(GraphView.class, "Cost Graph", ViewType.CENTER),
-//					new ViewInfo(ActivityEmbeddedView.class, ActivityEmbeddedView.VIEW_ROLE_NAME, ActivityEmbeddedView.class.getName(), ViewType.EMBEDDED, null, null, true, ActivityComponent.class),
-//					new ViewInfo(ActivityOverviewView.class, ActivityOverviewView.VIEW_ROLE_NAME, ActivityOverviewView.class.getName(), ViewType.OBJECT, null, null, true, ActivityComponent.class),
-//		    		new ViewInfo(ActivityOverviewView.class, ActivityOverviewView.VIEW_ROLE_NAME, ActivityOverviewView.class.getName(), ViewType.CENTER, null, null, true, ActivityComponent.class)
-//					
-//			);
-//		} else if (componentTypeId.equals(TimelineComponent.class.getName())) {
-//			return Arrays.asList(
-//					new ViewInfo(TimelineRowView.class, "New Timeline", ViewType.CENTER),
-//					new ViewInfo(TimelineRowView.class, "New Timeline", ViewType.OBJECT),
-//		    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.CENTER, null, null, true, TimelineComponent.class),
-//		    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.OBJECT, null, null, true, TimelineComponent.class),
-//		    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.EMBEDDED, null, null, true, TimelineComponent.class)
-//			);
-//		}
+
 		
 		// TimelineFilterViewPolicy will suppress these as appropriate
-		return Arrays.asList(					
+		return Arrays.asList(
+			    	/*new ViewInfo(ScenarioView.class, "Scenario", ViewType.CENTER),
+			    	  new ViewInfo(ScenarioView.class, "Scenario", ViewType.OBJECT), */
 				    new ViewInfo(TimelineView.class, "Timeline", ViewType.CENTER),
 				    new ViewInfo(TimelineInspector.class, "Timeline Inspector", ViewType.CENTER_OWNED_INSPECTOR),
 					new ViewInfo(TimelineView.class, "Timeline", ViewType.OBJECT));
-//					new ViewInfo(GraphView.class, "Cost Graph", ViewType.OBJECT),
-//					new ViewInfo(GraphView.class, "Cost Graph", ViewType.CENTER));
-		//return Collections.emptyList();
 	}
 
 	@Override

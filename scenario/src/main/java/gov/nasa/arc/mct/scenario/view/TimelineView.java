@@ -25,8 +25,10 @@ import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.gui.View;
 import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 import gov.nasa.arc.mct.scenario.component.ActivityComponent;
+import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
+import gov.nasa.arc.mct.services.component.ViewType;
 import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.awt.BorderLayout;
@@ -47,8 +49,6 @@ import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 
@@ -60,6 +60,8 @@ import javax.swing.event.ChangeEvent;
  *
  */
 public class TimelineView extends AbstractTimelineView {
+	static final ViewInfo VIEW_INFO = new ViewInfo(TimelineView.class, "Timeline", ViewType.EMBEDDED);
+	
 	private static final int TIMELINE_ROW_HEIGHT = 40;
 	private static final int TIMELINE_ROW_SPACING = 8;
 	private static final long serialVersionUID = -5039383350178424964L;
@@ -72,8 +74,11 @@ public class TimelineView extends AbstractTimelineView {
 	
 	public TimelineView(AbstractComponent ac, ViewInfo vi) {
 		// Work with a clone, so that children pulled out using getComponents are all local versions
-		// This supports synchronization of Inspector with views in the Timeline
-		super(ac=PlatformAccess.getPlatform().getPersistenceProvider().getComponent(ac.getComponentId()),vi);
+		// This supports synchronization of Inspector with views in the Timeline		
+		super(vi.getViewType().equals(ViewType.EMBEDDED) ?
+				ac :
+				(ac=PlatformAccess.getPlatform().getPersistenceProvider().getComponent(ac.getComponentId())),
+				vi);
 		
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(upperPanel, BorderLayout.NORTH);
@@ -88,7 +93,10 @@ public class TimelineView extends AbstractTimelineView {
 			addTopLevelActivity(child);//addActivities(child, 0, new HashSet<String>());
 		}
 		
-		upperPanel.add(GraphView.VIEW_INFO.createView(ac));
+		List<CostFunctionCapability> costs = ac.getCapabilities(CostFunctionCapability.class);
+		if (costs != null && !costs.isEmpty()) {
+			upperPanel.add(new CollapsibleContainer(GraphView.VIEW_INFO.createView(ac)));
+		}
 	}
 
 	
@@ -143,7 +151,11 @@ public class TimelineView extends AbstractTimelineView {
 		DurationCapability dc = ac.getCapability(DurationCapability.class);		
 		if (dc != null && !ids.contains(ac.getComponentId())) {
 			// Using workunitdelegate means these views will sync with inspector
-			ac.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
+			// If we already have a delegate, use that; otherwise, use manifested component
+			// (this strategy permits parent views, like Scenario, to take over)
+			AbstractComponent manifestedComponent = getManifestedComponent();
+			AbstractComponent workDelegate = manifestedComponent.getWorkUnitDelegate();
+			ac.getCapability(ComponentInitializer.class).setWorkUnitDelegate(workDelegate != null ? workDelegate : manifestedComponent);
 			addViewToRow(dc, ac, (ActivityComponent) (parent instanceof ActivityComponent ? parent : null), block, depth);
 			ids.add(ac.getComponentId()); // Prevent infinite loops in case of cycle
 			for (AbstractComponent child : ac.getComponents()) {

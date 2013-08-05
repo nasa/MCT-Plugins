@@ -43,8 +43,7 @@ public final class TypePropertyEditor implements PropertyEditor<Object> {
 
 	@SuppressWarnings("unused")
 	private String verify(String s) {
-		assert s != null;
-		if (s.isEmpty()) {
+		if (s == null) {
 			return "Cannot be unspecified";
 		}
 		/*try { // add a test if only certain types / type format is permitted

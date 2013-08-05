@@ -182,6 +182,7 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 		middlePanel.setOpaque(isTopLevelControl);
 		lowerPanel.setVisible(isTopLevelControl);
 		overlay.setVisible(false);
+		contentPane.setOpaque(isTopLevelControl);
 		if (parent != null) {
 			parent.addChangeListener(this);
 		}
@@ -507,7 +508,7 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 				long time = (long) (x / getPixelScale()) + getTimeOffset();
 				FontMetrics metrics = g.getFontMetrics(g.getFont());
 				for (Component c : costComponents) {
-					if (c instanceof CostOverlay) {
+					if (c instanceof CostOverlay && c.isShowing()) {
 						int compX = getXRelativeToContentPane(c);
 						if (compX <= x+getLeftPadding() && compX + c.getWidth() >= x+getLeftPadding()) {
 							List<CostFunctionCapability> costs = ((CostOverlay) c).getCostFunctions();

@@ -27,9 +27,11 @@ import gov.nasa.arc.mct.policy.Policy;
 import gov.nasa.arc.mct.policy.PolicyContext;
 import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
+import gov.nasa.arc.mct.scenario.component.ScenarioComponent;
 import gov.nasa.arc.mct.scenario.component.TimelineComponent;
 import gov.nasa.arc.mct.scenario.view.AbstractTimelineView;
 import gov.nasa.arc.mct.scenario.view.GraphView;
+import gov.nasa.arc.mct.scenario.view.ScenarioView;
 import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.ViewInfo;
@@ -66,6 +68,14 @@ public class TimelineFilterViewPolicy implements Policy  {
 			}
 		}
 		
+		// Scenario view is exclusively available to Scenario objects
+		if (ScenarioView.class.isAssignableFrom(viewInfo.getViewClass())) {
+			if (!(targetComponent instanceof ScenarioComponent)) {
+				return new ExecutionResult(context, false, 
+						viewInfo.getViewName() + " only valid for Timeline objects.");
+			}
+		}
+		
 		// Timeline view is exclusively available to Timeline objects
 		if (TimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
 			if (!(targetComponent instanceof TimelineComponent)) {
@@ -88,9 +98,12 @@ public class TimelineFilterViewPolicy implements Policy  {
 		if (targetComponent instanceof TimelineComponent &&
 			(viewInfo.getViewType() == ViewType.OBJECT || viewInfo.getViewType() == ViewType.CENTER) &&
 			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
-			// TODO: Probably also want Info view
-			return new ExecutionResult(context, false, 
-					"Timeline components support only Timeline views");
+			// Also permit Info view; unfortunately, we can't specify that class directly due to classpath
+			// Accept anything with "Info" in it, in case a plug-in has custom Info views
+			if (!viewInfo.getViewClass().getSimpleName().contains("Info")) {
+				return new ExecutionResult(context, false, 
+						"Timeline components support only Timeline views");
+			}
 		}
 		return trueResult;
 	}
