@@ -185,7 +185,8 @@ public class TimelineDurationController extends MouseAdapter {
 				((Component) src).repaint();
 			}			
 			 
-			parentView.getManifestedComponent().save();
+			parentView.save();
+
 			priorX = e.getXOnScreen();
 		}
 	}

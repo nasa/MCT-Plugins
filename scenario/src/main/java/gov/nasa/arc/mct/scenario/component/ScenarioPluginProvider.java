@@ -55,7 +55,7 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
 		// return the component types provided
-		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType /*, scenarioComponentType */ );
+		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType , scenarioComponentType   );
 	}
 
 	@Override
@@ -69,8 +69,8 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 		
 		// TimelineFilterViewPolicy will suppress these as appropriate
 		return Arrays.asList(
-			    	/*new ViewInfo(ScenarioView.class, "Scenario", ViewType.CENTER),
-			    	  new ViewInfo(ScenarioView.class, "Scenario", ViewType.OBJECT), */
+			    	new ViewInfo(ScenarioView.class, "Scenario", ViewType.CENTER),
+			    	new ViewInfo(ScenarioView.class, "Scenario", ViewType.OBJECT), 
 				    new ViewInfo(TimelineView.class, "Timeline", ViewType.CENTER),
 				    new ViewInfo(TimelineInspector.class, "Timeline Inspector", ViewType.CENTER_OWNED_INSPECTOR),
 					new ViewInfo(TimelineView.class, "Timeline", ViewType.OBJECT));

@@ -31,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -159,6 +160,19 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 	
 	public void select(View view) {
 		timelineContainer.select(view);
+	}
+	
+	/**
+	 * Invoke save on the component in this view, as well as for any parent views
+	 */
+	public void save() {
+		getManifestedComponent().save();
+		AbstractTimelineView parent = (AbstractTimelineView) SwingUtilities.getAncestorOfClass(AbstractTimelineView.class, this);
+		if (parent != null) {
+			parent.save();
+		}
+		repaint();
+		revalidate();
 	}
 	
 }

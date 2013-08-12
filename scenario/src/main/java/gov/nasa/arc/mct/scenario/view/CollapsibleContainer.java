@@ -25,23 +25,45 @@ import gov.nasa.arc.mct.gui.View;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * A collapsible Swing container for an MCT view. Includes a little triangle 
+ * to control the visibility of the view beneath.
+ * 
+ * @author vwoeltje
+ *
+ */
 public class CollapsibleContainer extends JPanel {
 	private static final long serialVersionUID = -7397365143392342779L;
-
+	
 	private View view;
 	private Component label;
 
+	/**
+	 * Create a new collapsible container for the specified view. 
+	 * This will be labeled with the view's name.
+	 * @param view
+	 */
 	public CollapsibleContainer(View view) {
 		this(view, new JLabel(view.getInfo().getViewName()));
 	}
 	
+	/**
+	 * Create a new collapsible container for the specified view; 
+	 * this will be labeled by the provided Swing component.
+	 * @param view
+	 * @param label
+	 */
 	public CollapsibleContainer(View view, Component label) {
 		this.view = view;
 		this.label = label;
@@ -55,10 +77,13 @@ public class CollapsibleContainer extends JPanel {
 	
 	private JComponent createTopPanel() {
 		JPanel panel = new JPanel();
+		JLabel twister = new JLabel(new TwistIcon());
 		panel.setOpaque(false);
-		panel.setLayout(new BorderLayout());
-		panel.add(label, BorderLayout.WEST);
-		panel.addMouseListener(new MouseAdapter() {
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.add(Box.createHorizontalStrut(8));
+		panel.add(twister);
+		panel.add(label);
+		twister.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				view.setVisible(!view.isVisible());
@@ -66,4 +91,42 @@ public class CollapsibleContainer extends JPanel {
 		});
 		return panel;
 	}
+	
+	private class TwistIcon implements Icon {
+		private final int size;
+	
+		public TwistIcon() {
+			size = 10;
+		}
+		
+		@Override
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			// Draw a triangle pointing either right or left
+			int halfSize = getIconWidth() / 2;
+			int fromCenter = halfSize - 2;
+			int[] xPts = new int[]{ halfSize - fromCenter, halfSize - fromCenter, halfSize + fromCenter};
+			int[] yPts = new int[]{ halfSize - fromCenter, halfSize + fromCenter, halfSize };
+			for (int i = 0; i < 3; i++) {
+				xPts[i] += x;
+				yPts[i] += y;
+			}
+			if (!view.isVisible()) {
+				g.fillPolygon(xPts, yPts, 3);
+			} else {
+				g.fillPolygon(yPts, xPts, 3);
+			}
+		}
+
+		@Override
+		public int getIconWidth() {
+			return size;
+		}
+
+		@Override
+		public int getIconHeight() {
+			return size;
+		}
+		
+	}
+
 }

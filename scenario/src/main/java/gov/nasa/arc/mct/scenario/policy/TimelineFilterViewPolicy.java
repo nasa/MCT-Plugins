@@ -83,6 +83,21 @@ public class TimelineFilterViewPolicy implements Policy  {
 						viewInfo.getViewName() + " only valid for Timeline objects.");
 			}
 		}
+		
+		// After considering Scenario and Timeline views, only offer Info views for Timelines/Scenarios
+		if ((targetComponent instanceof TimelineComponent  ||
+			targetComponent instanceof ScenarioComponent) &&
+			(viewInfo.getViewType() == ViewType.OBJECT || viewInfo.getViewType() == ViewType.CENTER) &&
+			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
+			// Also permit Info view; unfortunately, we can't specify that class directly due to classpath
+			// Accept anything with "Info" in it, in case a plug-in has custom Info views
+			if (!viewInfo.getViewClass().getSimpleName().contains("Info")) {
+				return new ExecutionResult(context, false, 
+						"Timeline components support only Timeline views");
+			}
+		}
+		
+		// Expose Timeline Inspector for Timeline components
 		if (viewInfo.getViewType() == ViewType.CENTER_OWNED_INSPECTOR) {
 			if (targetComponent instanceof TimelineComponent &&
 				!TimelineInspector.class.isAssignableFrom(viewInfo.getViewClass())) {
@@ -95,16 +110,8 @@ public class TimelineFilterViewPolicy implements Policy  {
 							"Timeline Inspector should pair with Timeline components");					
 			}
 		}
-		if (targetComponent instanceof TimelineComponent &&
-			(viewInfo.getViewType() == ViewType.OBJECT || viewInfo.getViewType() == ViewType.CENTER) &&
-			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
-			// Also permit Info view; unfortunately, we can't specify that class directly due to classpath
-			// Accept anything with "Info" in it, in case a plug-in has custom Info views
-			if (!viewInfo.getViewClass().getSimpleName().contains("Info")) {
-				return new ExecutionResult(context, false, 
-						"Timeline components support only Timeline views");
-			}
-		}
+		
+		
 		return trueResult;
 	}
 

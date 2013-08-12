@@ -4,6 +4,8 @@ import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.components.JAXBModelStatePersistence;
 import gov.nasa.arc.mct.components.ModelStatePersistence;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ScenarioComponent extends CostFunctionComponent implements DurationCapability {
@@ -49,6 +51,23 @@ public class ScenarioComponent extends CostFunctionComponent implements Duration
 	
 	public ActivityModelRole getModel() {
 		return model.get();
+	}
+	
+	@Override
+	public Set<AbstractComponent> getAllModifiedObjects() {
+		// Note that this is necessary to support Save All
+		// ("all modified objects" is the All in Save All;
+		//  typically, this should be all dirty children.)		
+		
+		// TODO: What about cycles?
+		Set<AbstractComponent> modified = new HashSet<AbstractComponent>();
+		for (AbstractComponent child : getComponents()) {
+			if (child.isDirty()) {
+				modified.add(child);
+			}
+			modified.addAll(child.getAllModifiedObjects());
+		}
+		return modified;
 	}
 
 	@Override

@@ -53,7 +53,7 @@ import javax.swing.JPanel;
 public class GraphView extends AbstractTimelineView {
 	private static final long serialVersionUID = -2300291952094003401L;
 
-	public static final String VIEW_ROLE_NAME = "Cost Graph";
+	public static final String VIEW_ROLE_NAME = "Costs";
 	public static final ViewInfo VIEW_INFO = 
 			new ViewInfo(GraphView.class, GraphView.VIEW_ROLE_NAME, ViewType.EMBEDDED);
 	
@@ -63,10 +63,6 @@ public class GraphView extends AbstractTimelineView {
 	
 	private static final Color DEFAULT_FOREGROUND_COLOR = Color.BLACK;
 	
-	private static final Color GRAPH_PALETTE[] = {
-		new Color(203, 217, 77), new Color(242, 163, 16), 
-		new Color(77, 217, 203), new Color(16, 163, 242)
-	};
 	
 	public GraphView(AbstractComponent ac, ViewInfo vi) {
 		super(ac, vi);
@@ -115,8 +111,7 @@ public class GraphView extends AbstractTimelineView {
 			// Choose color for data line
 			// Note that hash ensures that the same cost always gets the same color,
 			// but does not ensure color uniqueness. Should be OK since graphs are not overlaid
-			int colorIndex = Math.abs(cost.getName().hashCode()) % GRAPH_PALETTE.length;
-			g.setColor(GRAPH_PALETTE[colorIndex]); // TODO: Get from CostFunction ? 
+			g.setColor(ScenarioColorPalette.getColor(cost.getName())); // TODO: Get from CostFunction ? 
 			
 			// Draw smoothly, if possible
 			if (g instanceof Graphics2D) {

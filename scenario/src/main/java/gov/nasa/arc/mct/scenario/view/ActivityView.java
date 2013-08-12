@@ -2,6 +2,7 @@ package gov.nasa.arc.mct.scenario.view;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.gui.View;
+import gov.nasa.arc.mct.scenario.component.ActivityComponent;
 import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.CostFunctionComponent;
 import gov.nasa.arc.mct.scenario.component.DecisionComponent;
@@ -13,13 +14,16 @@ import gov.nasa.arc.mct.services.component.ViewType;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.util.Date;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 /**
  * A View of an Activity object, specifically for use as an embedded view within a 
@@ -45,7 +49,14 @@ public class ActivityView extends View implements CostOverlay {
 			bg = ActivityBackgroundShape.DECISION;			
 		}
 		durationCapability = ac.getCapability(DurationCapability.class);
-		setOpaque(false);
+		setOpaque(false);		
+		if (ac instanceof ActivityComponent) {
+			String type = ((ActivityComponent) ac).getType();
+			if (type != null && !type.isEmpty()) {
+				durationColor = ScenarioColorPalette.getColorMixed(type, durationColor, 0.75f);
+				lineColor = durationColor.darker();
+			}
+		}
 	}
 	
 	@Override
@@ -54,13 +65,13 @@ public class ActivityView extends View implements CostOverlay {
 		repaint();
 		
 		// Update parent component views (may include cost graphs)
-		AbstractComponent parent = getManifestedComponent().getWorkUnitDelegate();
-		if (parent != null && parent != getManifestedComponent()) {
-			for (View v : parent.getAllViewManifestations()) {
-				// Repaint and revalidate should be benign for views that don't care
-				v.repaint();
-				v.revalidate();
-			}
+		Container parent;
+		Component child = this;
+		while ( (parent = SwingUtilities.getAncestorOfClass(View.class, child)) != null) {
+				parent.repaint();
+				parent.invalidate();
+				parent.validate();
+				child = parent;		
 		}
 	}
 	
@@ -76,14 +87,21 @@ public class ActivityView extends View implements CostOverlay {
 			// Draw activity duration			
 			bg.paint(g2, getWidth(), getHeight(), lineColor, durationColor);
 			
-			String name = getManifestedComponent().getDisplayName();			
+			// Prepare a tool tip
+			AbstractComponent ac = getManifestedComponent();
+			String name = ac.getDisplayName();			
 			String duration = (durationCapability != null) ?
 				DurationFormatter.formatDuration(durationCapability.getEnd() - durationCapability.getStart()) : 
 					"";
 			
 			bg.paintLabels(g2, name, duration, getWidth(), getHeight(), getForeground());
 
-			setToolTipText(name + " " + duration);			
+			String type = "";
+			if (ac instanceof ActivityComponent) {
+				type = ((ActivityComponent) ac).getType();
+			} 
+
+			setToolTipText(name + " " + duration + (type.isEmpty() ? "" : (" [" + type + "]")));			
 		}
 	}
 	
