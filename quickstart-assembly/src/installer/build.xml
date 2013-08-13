@@ -35,6 +35,7 @@
     <mkdir dir = "${bin}" />
     <javac srcdir  = "${src}"
            destdir = "${bin}"
+           source  = "1.6" 
            target  = "1.6" >
       <classpath>
         <fileset dir = "${qpkg}">
