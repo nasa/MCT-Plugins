@@ -30,6 +30,7 @@ import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
 import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
+import gov.nasa.arc.mct.services.internal.component.Updatable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,6 +41,7 @@ import java.awt.Graphics;
 import java.awt.LayoutManager2;
 import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +52,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 
 /**
@@ -70,24 +74,88 @@ public class TimelineView extends AbstractTimelineView {
 	private List<TimelineBlock> blocks = new ArrayList<TimelineBlock>();
 	private JPanel upperPanel = new JPanel();
 	private Color backgroundColor = Color.WHITE;
-	
+	private View  costGraph = null;
 	
 	public TimelineView(AbstractComponent ac, ViewInfo vi) {
-		// Work with a clone, so that children pulled out using getComponents are all local versions
-		// This supports synchronization of Inspector with views in the Timeline		
+		// When we are a non-embedded view, work with a fresh copy of the 
+		// component direct from persistence. This ensures that we get fresh 
+		// copies of children, meaning we can propagate changes to e.g. 
+		// Activities within managed views (including Timeline Inspector) 
+		// without effecting the rest of the system.
 		super(vi.getViewType().equals(ViewType.EMBEDDED) ?
 				ac :
 				(ac=PlatformAccess.getPlatform().getPersistenceProvider().getComponent(ac.getComponentId())),
-				vi);
+				vi);		
 		
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(upperPanel, BorderLayout.NORTH);
 		upperPanel.setLayout(new BoxLayout(upperPanel, BoxLayout.Y_AXIS));
 		upperPanel.setOpaque(false);
-		upperPanel.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
 		
 		getContentPane().setBackground(backgroundColor);
 				
+		buildUpperPanel();
+		
+		// Refresh on any ancestor changes - these may change time scales
+		this.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				refreshAll();
+			}
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				refreshAll();
+			}
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				refreshAll();
+			}			
+		});
+	}
+	
+	@Override
+	public void viewPersisted() {
+		// Always get the fresh version from the database, if we're non-embedded
+		if (!getInfo().getViewType().equals(ViewType.EMBEDDED)) {
+			setManifestedComponent(PlatformAccess.getPlatform().getPersistenceProvider().getComponent(getManifestedComponent().getComponentId()));
+		}
+		blocks.clear();
+		upperPanel.removeAll();
+
+		// Cache current selection to restore later
+		Collection<View> selected = getSelectionProvider().getSelectedManifestations();
+		String selectedId = null;
+		if (!selected.isEmpty()) {
+			selectedId = selected.iterator().next().getManifestedComponent().getComponentId();
+			select(null); // TODO: Restore selection to previously-selected component
+		}
+		
+		// Rebuild the view
+		buildUpperPanel();
+		
+		// Restore the selection
+		if (selectedId != null) {
+			selectComponent(selectedId);
+		}
+		
+		// Update cost graph
+		if (costGraph != null) {
+			costGraph.setManifestedComponent(getManifestedComponent());
+			costGraph.viewPersisted();
+		}
+		
+		// Finally, ensure time settings are obeyed
+		refreshAll();
+	}
+	
+	private void buildUpperPanel() {
+		upperPanel.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
+		
+		AbstractComponent ac = getManifestedComponent();
+		if (!getInfo().getViewType().equals(ViewType.EMBEDDED)) { // If we're a clone, add a view manifestation of "this"
+			ac.addViewManifestation(this);
+		}
+
 		// Add all children
 		for (AbstractComponent child : ac.getComponents()) {
 			addTopLevelActivity(child);//addActivities(child, 0, new HashSet<String>());
@@ -95,15 +163,11 @@ public class TimelineView extends AbstractTimelineView {
 		
 		List<CostFunctionCapability> costs = ac.getCapabilities(CostFunctionCapability.class);
 		if (costs != null && !costs.isEmpty()) {
-			upperPanel.add(new CollapsibleContainer(GraphView.VIEW_INFO.createView(ac)));
+			upperPanel.add(new CollapsibleContainer(costGraph = GraphView.VIEW_INFO.createView(ac)));
 		}
 	}
 
-	
-	
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		super.stateChanged(e);
+	private void refreshAll() {
 		revalidate();
 		repaint();
 		for (TimelineBlock block : blocks) {
@@ -114,6 +178,13 @@ public class TimelineView extends AbstractTimelineView {
 				row.repaint();
 			}
 		}
+	}
+	
+	
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		super.stateChanged(e);
+		refreshAll();
 	}
 
 

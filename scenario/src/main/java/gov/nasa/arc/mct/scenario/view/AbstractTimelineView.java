@@ -27,6 +27,8 @@ import gov.nasa.arc.mct.gui.View;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -158,8 +160,23 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 		return timelineContainer;
 	}
 	
+	/**
+	 * Select the specified view
+	 * @param view the view to select
+	 */
 	public void select(View view) {
 		timelineContainer.select(view);
+	}
+	
+	/**
+	 * Try to select a specific component (by id)
+	 * If there is no embedded view of a component with this id, this
+	 * method does nothing.
+	 * 
+	 * @param componentId the id of a component to select
+	 */
+	public void selectComponent(String componentId) {
+		timelineContainer.selectComponent(componentId);
 	}
 	
 	/**

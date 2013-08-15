@@ -76,6 +76,13 @@ public class GraphView extends AbstractTimelineView {
 		}
 	}
 
+	@Override
+	public void viewPersisted() {
+		getContentPane().removeAll();		
+		for (CostFunctionCapability cost : getManifestedComponent().getCapabilities(CostFunctionCapability.class)) {
+			getContentPane().add(new CostGraph(cost));
+		}
+	}
 
 
 	private class CostGraph extends JPanel implements CostOverlay {

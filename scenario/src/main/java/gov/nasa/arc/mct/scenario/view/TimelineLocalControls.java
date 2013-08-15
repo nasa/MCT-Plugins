@@ -676,6 +676,10 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 		selectedView = null;
 	}
 	
+	/**
+	 * Select the specified view
+	 * @param view the view to select
+	 */
 	public void select(View view) {
 		if (parent != null && parent != this) {
 			parent.select(view);
@@ -683,6 +687,31 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 			Collection<View> oldSelections = getSelectedManifestations();
 			selectedView = view;
 			firePropertyChange(SelectionProvider.SELECTION_CHANGED_PROP, oldSelections, getSelectedManifestations());
+		}
+	}
+	
+	/**
+	 * Try to select a specific component (by id)
+	 * If there is no embedded view of a component with this id, this
+	 * method does nothing.
+	 * 
+	 * @param componentId the id of a component to select
+	 */
+	public void selectComponent(String componentId) {
+		searchAndSelect(getContentPane(), componentId);
+	}
+	
+	private void searchAndSelect(Component comp, String id) {
+		if (comp instanceof View) {
+			if (((View) comp).getManifestedComponent().getComponentId().equals(id)) {
+				select((View) comp);
+				return;
+			}			
+		}
+		if (comp instanceof Container) { //Not found, keep searching
+			for (Component child : ((Container) comp).getComponents()) {
+				searchAndSelect(child, id);
+			}
 		}
 	}
 	
