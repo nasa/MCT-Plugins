@@ -49,7 +49,7 @@ public class ActivityData {
 	}
 	
 	public String getActivityType() {
-		return type;
+		return type != null ? type : ""; // Never return null
 	}
 	
 	public void setActivityType(String type) {
