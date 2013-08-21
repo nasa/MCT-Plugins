@@ -66,8 +66,8 @@ import javax.swing.event.ChangeEvent;
 public class TimelineView extends AbstractTimelineView {
 	static final ViewInfo VIEW_INFO = new ViewInfo(TimelineView.class, "Timeline", ViewType.EMBEDDED);
 	
-	private static final int TIMELINE_ROW_HEIGHT = 40;
-	private static final int TIMELINE_ROW_SPACING = 8;
+	private static final int TIMELINE_ROW_HEIGHT = 24;
+	private static final int TIMELINE_ROW_SPACING = 6;
 	private static final long serialVersionUID = -5039383350178424964L;
 
 	
@@ -158,7 +158,7 @@ public class TimelineView extends AbstractTimelineView {
 
 		// Add all children
 		for (AbstractComponent child : ac.getComponents()) {
-			addTopLevelActivity(child);//addActivities(child, 0, new HashSet<String>());
+			addTopLevelActivity(child, new HashSet<String>());//addActivities(child, 0, new HashSet<String>());
 		}
 		
 		List<CostFunctionCapability> costs = ac.getCapabilities(CostFunctionCapability.class);
@@ -188,7 +188,7 @@ public class TimelineView extends AbstractTimelineView {
 	}
 
 
-	private void addTopLevelActivity(AbstractComponent ac) {
+	private void addTopLevelActivity(AbstractComponent ac, Set<String> ignore) {
 		DurationCapability dc = ac.getCapability(DurationCapability.class);
 		if (dc != null) {
 			TimelineBlock block = null;
@@ -202,10 +202,10 @@ public class TimelineView extends AbstractTimelineView {
 				block = new TimelineBlock();
 				block.setLayout(new BoxLayout(block, BoxLayout.Y_AXIS));
 				block.setOpaque(false);				
-				block.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
+				//block.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
 				block.setAlignmentX(0.5f);
 				upperPanel.add(block);
-				upperPanel.add(new TimelineSeparator());
+				upperPanel.add(Box.createVerticalStrut(TIMELINE_ROW_SPACING));
 				blocks.add(block);
 			}			
 			if (dc.getStart() < block.minimumTime) {
@@ -215,7 +215,12 @@ public class TimelineView extends AbstractTimelineView {
 				block.maximumTime = dc.getEnd();
 			}
 			addActivities(ac, null, 0, new HashSet<String>(), block);
-		}		
+		} else if (!ignore.contains(ac.getComponentId())){  // Avoid cycles
+			ignore.add(ac.getComponentId());
+			for (AbstractComponent child : ac.getComponents()) {
+				addTopLevelActivity(child, ignore);
+			}
+		}
 	}
 
 	private void addActivities(AbstractComponent ac, AbstractComponent parent, int depth, Set<String> ids, TimelineBlock block) {
@@ -324,18 +329,10 @@ public class TimelineView extends AbstractTimelineView {
 		public long maximumTime = Long.MIN_VALUE;
 		public long minimumTime = Long.MAX_VALUE;
 		public List<JComponent> rows = new ArrayList<JComponent>();
-	}
-
-	private class TimelineSeparator extends JPanel {
-		private static final long serialVersionUID = -8551198172846693356L;
-
-		public TimelineSeparator() {
-			setOpaque(false);
-			add(Box.createVerticalStrut(1));
-		}
 		
 		public void paintComponent(Graphics g) {
-			g.drawLine(getLeftPadding(), 0, getWidth() - getRightPadding(), 0);
+			g.drawLine(getLeftPadding(), getHeight()-1, getWidth() - getRightPadding(), getHeight()-1);
 		}
 	}
+
 }

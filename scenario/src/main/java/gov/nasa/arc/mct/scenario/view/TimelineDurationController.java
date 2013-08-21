@@ -43,6 +43,8 @@ import java.util.Map;
  *
  */
 public class TimelineDurationController extends MouseAdapter {
+	private static final int MINIMUM_PIXEL_WIDTH = 4;
+	
 	private ActivityComponent parentComponent = null;
 	private DurationCapability durationCapability; 
 	private AbstractTimelineView parentView;
@@ -146,10 +148,12 @@ public class TimelineDurationController extends MouseAdapter {
 					(durationCapability.getStart() - initialStart) :
 					(durationCapability.getEnd() - initialEnd);			
 		
+					
+			long pixelSize = (long) (1.0 / parentView.getPixelScale());
 			tDiff = clamp(tDiff,
 					activeHandle.changesStart ? initialStart : initialEnd,
-					activeHandle.changesStart ? parentView.getStart() : initialStart,
-					activeHandle.changesEnd   ? parentView.getEnd() : initialEnd							
+					activeHandle.changesStart ? parentView.getStart() : (initialStart + pixelSize * MINIMUM_PIXEL_WIDTH),
+					activeHandle.changesEnd   ? parentView.getEnd()   : (initialEnd   - pixelSize * MINIMUM_PIXEL_WIDTH)							
 					);
 			tDiff -= currentTimeDiff; // Determine how far (in ms) to move from current position
 			if (tDiff == 0) return; // No need to move

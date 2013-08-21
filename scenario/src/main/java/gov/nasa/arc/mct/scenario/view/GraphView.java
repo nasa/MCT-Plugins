@@ -53,7 +53,7 @@ import javax.swing.JPanel;
 public class GraphView extends AbstractTimelineView {
 	private static final long serialVersionUID = -2300291952094003401L;
 
-	public static final String VIEW_ROLE_NAME = "Costs";
+	public static final String VIEW_ROLE_NAME = "Graph";
 	public static final ViewInfo VIEW_INFO = 
 			new ViewInfo(GraphView.class, GraphView.VIEW_ROLE_NAME, ViewType.EMBEDDED);
 	

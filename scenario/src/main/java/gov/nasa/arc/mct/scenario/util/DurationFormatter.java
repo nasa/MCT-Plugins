@@ -99,7 +99,7 @@ public class DurationFormatter {
 	 */
 	public static String formatDuration(long duration) {
 		StringBuilder builder = new StringBuilder();
-		if (duration > MS_IN_DAY) { // Don't show days if duration is less than a day
+		if (duration >= MS_IN_DAY) { // Don't show days if duration is less than a day
 			builder.append(duration / MS_IN_DAY); // Integer divide to get days
 			builder.append(' ');
 		}
