@@ -5,6 +5,7 @@ import gov.nasa.arc.mct.components.JAXBModelStatePersistence;
 import gov.nasa.arc.mct.components.ModelStatePersistence;
 import gov.nasa.arc.mct.components.PropertyDescriptor;
 import gov.nasa.arc.mct.components.PropertyDescriptor.VisualControlDescriptor;
+import gov.nasa.arc.mct.scenario.component.TimePropertyEditor.TimeProperty;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,14 +83,18 @@ public class DecisionComponent extends AbstractComponent implements DurationCapa
 		// We specify a mutable text field.  The control display's values are maintained in the business model
 		// via the PropertyEditor object.  When a new value is to be set, the editor also validates the prospective value.
 		PropertyDescriptor startTime = new PropertyDescriptor("Start Time", 
-				new DecisionStartTimePropertyEditor(this),  VisualControlDescriptor.TextField);
+				new TimePropertyEditor(this, TimeProperty.START),  VisualControlDescriptor.TextField);
 		startTime.setFieldMutable(true);
 		PropertyDescriptor endTime = new PropertyDescriptor("End Time", 
-				new DecisionEndTimePropertyEditor(this),  VisualControlDescriptor.TextField);
+				new TimePropertyEditor(this, TimeProperty.END),  VisualControlDescriptor.TextField);
 		endTime.setFieldMutable(true);
-
+		PropertyDescriptor duration = new PropertyDescriptor("Duration",
+				new TimePropertyEditor(this, TimeProperty.DURATION), VisualControlDescriptor.TextField);
+		duration.setFieldMutable(true);
+		
 		fields.add(startTime);
 		fields.add(endTime);
+		fields.add(duration);
 
 		return fields;
 	}

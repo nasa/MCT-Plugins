@@ -5,6 +5,7 @@ import gov.nasa.arc.mct.components.JAXBModelStatePersistence;
 import gov.nasa.arc.mct.components.ModelStatePersistence;
 import gov.nasa.arc.mct.components.PropertyDescriptor;
 import gov.nasa.arc.mct.components.PropertyDescriptor.VisualControlDescriptor;
+import gov.nasa.arc.mct.scenario.component.TimePropertyEditor.TimeProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,13 +110,13 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 				new TypePropertyEditor(this), VisualControlDescriptor.TextField);
 		type.setFieldMutable(true);
 		PropertyDescriptor startTime = new PropertyDescriptor("Start Time", 
-				new ActivityStartTimePropertyEditor(this),  VisualControlDescriptor.TextField);
+				new TimePropertyEditor(this, TimeProperty.START),  VisualControlDescriptor.TextField);
 		startTime.setFieldMutable(true);
 		PropertyDescriptor endTime = new PropertyDescriptor("End Time", 
-				new ActivityEndTimePropertyEditor(this),  VisualControlDescriptor.TextField);
+				new TimePropertyEditor(this, TimeProperty.END),  VisualControlDescriptor.TextField);
 		endTime.setFieldMutable(true);
 		PropertyDescriptor duration = new PropertyDescriptor("Duration",
-				new DurationPropertyEditor(this), VisualControlDescriptor.TextField);
+				new TimePropertyEditor(this, TimeProperty.DURATION), VisualControlDescriptor.TextField);
 		duration.setFieldMutable(true);
 		PropertyDescriptor power = new PropertyDescriptor("Power (W)", 
 				new PowerPropertyEditor(this),  VisualControlDescriptor.TextField);
@@ -126,7 +127,7 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 
 		fields.add(type);
 		fields.add(startTime);
-		//fields.add(endTime); TODO: This is desirable, but must synchronize with Duration
+		fields.add(endTime);
 		fields.add(duration);
 		fields.add(power);
 		fields.add(comm);
