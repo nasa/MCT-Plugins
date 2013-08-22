@@ -91,10 +91,14 @@ public class DecisionComponent extends AbstractComponent implements DurationCapa
 		PropertyDescriptor duration = new PropertyDescriptor("Duration",
 				new TimePropertyEditor(this, TimeProperty.DURATION), VisualControlDescriptor.TextField);
 		duration.setFieldMutable(true);
+		PropertyDescriptor notes = new PropertyDescriptor("Notes", 
+				new NotesPropertyEditor(this),  VisualControlDescriptor.TextArea);
+		notes.setFieldMutable(true);
 		
 		fields.add(startTime);
 		fields.add(endTime);
 		fields.add(duration);
+		fields.add(notes);
 
 		return fields;
 	}

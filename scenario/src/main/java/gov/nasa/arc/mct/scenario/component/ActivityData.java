@@ -18,6 +18,7 @@ public class ActivityData {
 	private double power;
 	private double comm;
 	private String type;
+	private String notes;
 	private Date startDate;
 	private Date endDate;
 
@@ -54,6 +55,14 @@ public class ActivityData {
 	
 	public void setActivityType(String type) {
 		this.type = type;
+	}
+	
+	public String getNotes() {
+		return notes != null ? notes : ""; // Never return null
+	}
+	
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public Date getStartTime() {

@@ -16,6 +16,7 @@ public class DecisionData {
 
 	private Date startDate;
 	private Date endDate;
+	private String notes;
 
 	public Date getStartTime() {
 		return startDate;
@@ -31,6 +32,13 @@ public class DecisionData {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}	
+	
+	public String getNotes() {
+		return notes != null ? notes : ""; // Never return null
 	}
 	
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
 }

@@ -124,6 +124,9 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 		PropertyDescriptor comm = new PropertyDescriptor("Comm (Kb/s)", 
 				new CommPropertyEditor(this),  VisualControlDescriptor.TextField);
 		comm.setFieldMutable(true);
+		PropertyDescriptor notes = new PropertyDescriptor("Notes", 
+				new NotesPropertyEditor(this),  VisualControlDescriptor.TextArea);
+		notes.setFieldMutable(true);
 
 		fields.add(type);
 		fields.add(startTime);
@@ -131,6 +134,7 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 		fields.add(duration);
 		fields.add(power);
 		fields.add(comm);
+		fields.add(notes);
 
 		return fields;
 	}
