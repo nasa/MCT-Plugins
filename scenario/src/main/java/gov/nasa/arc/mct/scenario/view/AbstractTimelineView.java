@@ -150,7 +150,12 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void stateChanged(ChangeEvent e) {		
+		AbstractTimelineView parent = (AbstractTimelineView) SwingUtilities.getAncestorOfClass(AbstractTimelineView.class, this);
+		// Propagate changes up; ensures that Scenario, for example, stays in sync with timelines
+		if (parent != null) {
+			parent.stateChanged(e);
+		}
 		revalidate();
 		repaint();
 	}

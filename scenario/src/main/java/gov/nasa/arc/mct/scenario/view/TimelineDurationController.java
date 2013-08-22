@@ -118,7 +118,8 @@ public class TimelineDurationController extends MouseAdapter {
 		if (src instanceof View) {
 			((View) src).getManifestedComponent().save();
 			parentView.select(null);			
-			parentView.select((View) src);	// Should no longer be needed after InfoView refresh 
+			parentView.select((View) src);	// Should no longer be needed after InfoView refresh
+			parentView.save();
 		}
 	}
 
@@ -191,7 +192,7 @@ public class TimelineDurationController extends MouseAdapter {
 				((Component) src).repaint();
 			}			
 			 
-			parentView.save();
+			//parentView.save();
 
 			priorX = e.getXOnScreen();
 		}

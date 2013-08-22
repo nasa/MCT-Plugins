@@ -30,7 +30,6 @@ import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
 import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
-import gov.nasa.arc.mct.services.internal.component.Updatable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -42,6 +41,8 @@ import java.awt.LayoutManager2;
 import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,6 +120,21 @@ public class TimelineView extends AbstractTimelineView {
 		if (!getInfo().getViewType().equals(ViewType.EMBEDDED)) {
 			setManifestedComponent(PlatformAccess.getPlatform().getPersistenceProvider().getComponent(getManifestedComponent().getComponentId()));
 		}
+
+		// Re-create everything; layout may be much different
+		rebuildUpperPanel();
+		
+		// Update cost graph
+		if (costGraph != null) {
+			costGraph.setManifestedComponent(getManifestedComponent());
+			costGraph.viewPersisted();
+		}
+		
+		// Finally, ensure time settings are obeyed
+		refreshAll();
+	}
+	
+	private void rebuildUpperPanel() {
 		blocks.clear();
 		upperPanel.removeAll();
 
@@ -137,15 +153,6 @@ public class TimelineView extends AbstractTimelineView {
 		if (selectedId != null) {
 			selectComponent(selectedId);
 		}
-		
-		// Update cost graph
-		if (costGraph != null) {
-			costGraph.setManifestedComponent(getManifestedComponent());
-			costGraph.viewPersisted();
-		}
-		
-		// Finally, ensure time settings are obeyed
-		refreshAll();
 	}
 	
 	private void buildUpperPanel() {
@@ -187,6 +194,13 @@ public class TimelineView extends AbstractTimelineView {
 		refreshAll();
 	}
 
+	@Override
+	public void save() {
+		super.save();
+		if (detectOverlappingComponents()) {
+			rebuildUpperPanel();
+		}		
+	}
 
 	private void addTopLevelActivity(AbstractComponent ac, Set<String> ignore) {
 		DurationCapability dc = ac.getCapability(DurationCapability.class);
@@ -256,6 +270,50 @@ public class TimelineView extends AbstractTimelineView {
 		activityView.addMouseMotionListener(controller);
 	}
 	
+	private boolean detectOverlappingComponents() {
+		for (TimelineBlock block : blocks) {
+			if (block.rows.size() > 0) {
+				JComponent row = block.rows.get(0); // Top-level activities are in first row
+				List<DurationCapability> durations = getSortedVisibleDurations(row);
+				
+				// These are sorted, so check for some case where one duration's end
+				// is greater than the next duration's start.
+				for (int i = 0; i < durations.size() - 1; i++) {
+					if (durations.get(i).getEnd() > durations.get(i+1).getStart()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}	
+	
+	private List<DurationCapability> getSortedVisibleDurations(JComponent row) {
+		List<DurationCapability> durations = new ArrayList<DurationCapability>();
+		
+		// Assemble all durations associated with Views where expected in Swing hierarchy
+		for (Component c : row.getComponents()) {
+			if (c instanceof View) {
+				View v = (View) c;
+				DurationCapability dc = v.getManifestedComponent().getCapability(DurationCapability.class);
+				if (dc != null) {
+					durations.add(dc);
+				}
+			}
+		}
+
+		// Sort by start times
+		Collections.sort(durations, new Comparator<DurationCapability>() {
+			@Override
+			public int compare(DurationCapability a, DurationCapability b) {
+				long diff = (a.getStart() - b.getStart());				
+				// Diff could conceivably be more than MAX_INT, so reduce to 1 or -1
+				return (int) (diff / Math.abs(diff));
+			}
+		});
+		
+		return durations;
+	}
 
 	private class TimelineRowLayout implements LayoutManager2 {
 		private Map<Component, DurationCapability> durationInfo = new HashMap<Component, DurationCapability>();
