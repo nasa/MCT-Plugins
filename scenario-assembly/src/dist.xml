@@ -14,7 +14,13 @@
     		<outputDirectory>resources/properties</outputDirectory>
     		<destName>persistence.properties</destName>
     		<fileMode>0777</fileMode>
-    	</file>
+    	</file>    	  
+    	<file>
+	      <source>src/main/resources/properties/scenario.properties</source>
+	      <outputDirectory>resources/properties</outputDirectory>
+	      <filtered>true</filtered>
+	      <fileMode>0777</fileMode>
+	    </file>
     </files>
     <fileSets>
     	<fileSet>
@@ -35,7 +41,7 @@
     		<directory>src/main/resources</directory>
     		<outputDirectory>resources</outputDirectory>
    			<includes>
-   				<include>properties/mct.properties</include>
+   				<include>properties/mct.properties</include>   				
    			</includes>
     		<fileMode>0777</fileMode>
     		<directoryMode>0777</directoryMode>
