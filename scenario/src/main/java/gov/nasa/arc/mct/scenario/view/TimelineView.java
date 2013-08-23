@@ -308,7 +308,7 @@ public class TimelineView extends AbstractTimelineView {
 			public int compare(DurationCapability a, DurationCapability b) {
 				long diff = (a.getStart() - b.getStart());				
 				// Diff could conceivably be more than MAX_INT, so reduce to 1 or -1
-				return (int) (diff / Math.abs(diff));
+				return (int) (Math.signum((double)diff));
 			}
 		});
 		
