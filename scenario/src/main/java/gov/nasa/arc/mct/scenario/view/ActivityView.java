@@ -77,6 +77,9 @@ public class ActivityView extends View implements CostOverlay {
 				parent.invalidate();
 				parent.validate();
 				child = parent;		
+				if (parent instanceof AbstractTimelineView) {
+					((AbstractTimelineView) parent).save();
+				}
 		}
 	}
 	

@@ -116,13 +116,11 @@ public class DecisionComponent extends AbstractComponent implements DurationCapa
 	@Override
 	public void setStart(long start) {
 		getData().setStartDate(new Date(start));
-		//save();
 	}
 
 	@Override
 	public void setEnd(long end) {
 		getData().setEndDate(new Date(end));
-		//save();
 	}
 
 	@Override

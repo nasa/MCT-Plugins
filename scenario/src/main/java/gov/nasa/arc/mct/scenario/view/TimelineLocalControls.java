@@ -145,10 +145,9 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 		super(new BorderLayout());
 		//this.masterDuration = masterDuration;
 		
-		centerTime = (masterDuration.getStart() + masterDuration.getEnd()) / 2;
-		
-		start = masterDuration.getStart();
-		end = masterDuration.getEnd();
+		start = Math.min(start, masterDuration.getStart());
+		end = Math.max(end, masterDuration.getEnd());
+		centerTime = (start + end) / 2;
 		
 		setOpaque(false);
 		add(upperPanel = makeUpperPanel(), BorderLayout.NORTH);
@@ -172,6 +171,16 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 				updateAncestor();
 			}			
 		});
+	}
+	
+	public void updateMasterDuration(DurationCapability masterDuration) {	
+		if (parent != null) {
+			parent.updateMasterDuration(masterDuration);
+		} else {
+			start = Math.min(start, masterDuration.getStart());
+			end = Math.max(end, masterDuration.getEnd());
+			stateChanged(null);
+		}
 	}
 	
 	private void updateAncestor() {

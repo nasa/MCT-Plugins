@@ -82,17 +82,17 @@ public class DecisionCreationWizardUI  extends CreateWizardUI {
 		data.setStartDate(startDate);
 		data.setEndDate(endDate);
 		component.save();
-
-		if (targetComponent instanceof ActivityComponent) {
-			//TODO - this should be handled by addDelegateComponentsCallback 
-			//       in ActivityComponent, but at the time this is called 
-			//       (comp.newInstance above) there is still no 
-			//       time data associated with this component
-			((ActivityComponent) targetComponent).constrainChildren(decisionComponent, false);
-			((ActivityComponent) targetComponent).constrainChildren(decisionComponent, true);
-		}
         
         return component;
+	}
+	
+	private boolean checkValidity() {
+		try {
+			return DurationFormatter.parse(startTime.getText()) >= 0 && 
+				DurationFormatter.parse(duration.getText()) > 0;
+		} catch (ParseException e) {
+			return false;
+		}
 	}
 
 	@Override
@@ -194,6 +194,25 @@ public class DecisionCreationWizardUI  extends CreateWizardUI {
 		c.weightx = 1;
 		c.gridwidth = 2;
 		UIPanel.add(messagePanel,c);
+				
+		// Enable/disable Create button for valid user input
+		DocumentListener buttonEnabler = new DocumentListener() {
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				create.setEnabled(checkValidity());
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				create.setEnabled(checkValidity());				
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				create.setEnabled(checkValidity());			}			
+		};
+		startTime.getDocument().addDocumentListener(buttonEnabler);
+		duration.getDocument().addDocumentListener(buttonEnabler);
 				
 		UIPanel.setVisible(true);
 		return UIPanel;

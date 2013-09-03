@@ -197,4 +197,10 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 		revalidate();
 	}
 	
+	public void updateMasterDuration() {
+		DurationCapability dc = getManifestedComponent().getCapability(DurationCapability.class);
+		if (dc != null) {
+			timelineContainer.updateMasterDuration(dc);
+		}
+	}
 }

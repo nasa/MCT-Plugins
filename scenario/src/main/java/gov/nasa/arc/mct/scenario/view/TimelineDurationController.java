@@ -22,13 +22,10 @@
 package gov.nasa.arc.mct.scenario.view;
 
 
-import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.gui.View;
-import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 import gov.nasa.arc.mct.scenario.component.ActivityComponent;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
-import gov.nasa.arc.mct.services.component.ViewType;
-import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
+import gov.nasa.arc.mct.scenario.component.DurationConstraintSystem;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -49,6 +46,7 @@ public class TimelineDurationController extends MouseAdapter {
 	private DurationCapability durationCapability; 
 	private AbstractTimelineView parentView;
 	
+	private DurationConstraintSystem constraints;
 	private Map<Integer, DurationHandle> handles = new HashMap<Integer, DurationHandle>();
 	private DurationHandle activeHandle = null;
 	private int            initialX     = 0;
@@ -56,17 +54,14 @@ public class TimelineDurationController extends MouseAdapter {
 	private long           initialEnd   = 0;
 	private int            priorX       = 0;
 	
-	public TimelineDurationController(ActivityComponent immediateParent, DurationCapability dc,
-			AbstractTimelineView parent) {
-		this(dc, parent);
-		this.parentComponent = immediateParent;
-	}
 	
 	public TimelineDurationController(DurationCapability dc,
-			AbstractTimelineView parent) {
+			AbstractTimelineView parent,
+			DurationConstraintSystem constraints) {
 		super();
 		this.durationCapability = dc;
 		this.parentView = parent;
+		this.constraints = constraints;
 		
 		handles.put(Cursor.E_RESIZE_CURSOR, new DurationHandle(false, true));
 		handles.put(Cursor.W_RESIZE_CURSOR, new DurationHandle(true, false));
@@ -119,7 +114,6 @@ public class TimelineDurationController extends MouseAdapter {
 			((View) src).getManifestedComponent().save();
 			parentView.select(null);			
 			parentView.select((View) src);	// Should no longer be needed after InfoView refresh
-			parentView.save();
 		}
 	}
 
@@ -164,7 +158,6 @@ public class TimelineDurationController extends MouseAdapter {
 			// behavior occurs consistently (otherwise, a fast mouse gesture could 
 			// allow one sub-activity to "jump" over its sibling.)
 			long timeStep = (long) (1 / parentView.getPixelScale());
-			boolean isTowardStart = tDiff < 0;
 			
 			for (long t = 0; t <= Math.abs(tDiff); t+=timeStep) { 
 				long delta = (tDiff < 0 ? -1 : 1) *
@@ -177,9 +170,7 @@ public class TimelineDurationController extends MouseAdapter {
 					durationCapability.setEnd(durationCapability.getEnd() + delta);
 				}
 				
-				if (parentComponent != null) {
-					parentComponent.constrainChildren(durationCapability, isTowardStart);
-				}
+				constraints.change(durationCapability, tDiff < 0 ? -1 : 1);
 			}
 			
 			parentView.revalidate();

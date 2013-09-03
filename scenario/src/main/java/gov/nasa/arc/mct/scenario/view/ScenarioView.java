@@ -83,6 +83,7 @@ public class ScenarioView extends AbstractTimelineView {
 		getContentPane().setBackground(Color.WHITE);		
 		
 		buildUpperPanel();
+		
 	}
 	
 	@Override
