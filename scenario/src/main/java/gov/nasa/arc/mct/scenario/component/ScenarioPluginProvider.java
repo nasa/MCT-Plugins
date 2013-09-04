@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
+import javax.swing.ImageIcon;
+
 /**
  * ComponentProvider for the scenario plug-in. Exposes Activities, Scenarios, Timelines, 
  * Decisions, and associated policies/views to the MCT platform.
@@ -29,24 +31,30 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			bundle.getString("display_name_activity"),  
 			bundle.getString("description_activity"), 
 			ActivityComponent.class,
-			new ActivityCreationWizardUI());
+			new ActivityCreationWizardUI(),
+			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_activity.png")));
 
 	private static final ComponentTypeInfo decisionComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_decision"),  
 			bundle.getString("description_decision"), 
 			DecisionComponent.class,
-			new DecisionCreationWizardUI());
+			new DecisionCreationWizardUI(),
+			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_decision.png")));
 
 	private static final ComponentTypeInfo timelineComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_timeline"),  
 			bundle.getString("description_timeline"), 
-			TimelineComponent.class);
+			TimelineComponent.class,
+			true,
+			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_timeline.png")));
 
-	// TODO: Expose this & scenario view to MCT
 	private static final ComponentTypeInfo scenarioComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_scenario"),  
 			bundle.getString("description_scenario"), 
-			ScenarioComponent.class);
+			ScenarioComponent.class,
+			true,
+			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_scenario.png")));
+	
 	
 	private static final PolicyInfo timelinePolicy = new PolicyInfo(
 			PolicyInfo.CategoryType.FILTER_VIEW_ROLE.getKey(), 
@@ -55,7 +63,7 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
 		// return the component types provided
-		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType , scenarioComponentType   );
+		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType , scenarioComponentType );
 	}
 
 	@Override
