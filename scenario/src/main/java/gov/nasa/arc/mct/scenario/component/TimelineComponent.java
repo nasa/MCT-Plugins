@@ -74,17 +74,33 @@ public class TimelineComponent extends CostFunctionComponent implements Duration
 	public long getEnd() {
 		// The end of a Timeline is the end of its last activity
 		long end = 0;
+		Set<String> ignore = new HashSet<String>();
 		for (AbstractComponent child : getComponents()) {
-			DurationCapability dc = child.getCapability(DurationCapability.class);
-			if (dc != null) {
-				long childEnd = dc.getEnd();
-				if (childEnd > end) {
-					end = childEnd;
-				}
-			}
+			end = Math.max(end, getEndFor(child, ignore));
 		}
 		return end;
 	}
+	
+	// Recurse into collections to find possible end points
+	// until base case of a component with a duration or a 
+	// component with no children is reached.
+	// Maintain list of things to ignore, to avoid cycles
+	private long getEndFor(AbstractComponent child, Set<String> ignore) {
+		ignore.add(child.getComponentId());
+		DurationCapability dc = child.getCapability(DurationCapability.class);
+		if (dc != null) {
+			return dc.getEnd();
+		} else {
+			long end = 0;
+			for (AbstractComponent grandchild : child.getComponents()) {
+				if (!ignore.contains(grandchild.getComponentId())) {
+					end = Math.max(end, getEndFor(grandchild, ignore));
+				}
+			}
+			return end;
+		}
+	}
+	
 	@Override
 	public void setStart(long start) {
 		// TODO Auto-generated method stub
