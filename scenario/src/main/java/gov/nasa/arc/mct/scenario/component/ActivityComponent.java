@@ -56,21 +56,36 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 	public ActivityData getData() {
 		return getModel().getData();
 	}
-		
+	
+	private static ThreadLocal<Set<String>> ignore = new ThreadLocal<Set<String>>() {
+		@Override
+		protected Set<String> initialValue() {
+			return new HashSet<String>();
+		}		
+	};
+	
 	@Override
 	public Set<AbstractComponent> getAllModifiedObjects() {
 		// Note that this is necessary to support Save All
 		// ("all modified objects" is the All in Save All;
 		//  typically, this should be all dirty children.)
 		
-		// TODO: What about cycles?
+		// Avoid cycles - ignore self
+		ignore.get().add(getComponentId());
+		
 		Set<AbstractComponent> modified = new HashSet<AbstractComponent>();
 		for (AbstractComponent child : getComponents()) {
-			if (child.isDirty()) {
-				modified.add(child);
-			}
-			modified.addAll(child.getAllModifiedObjects());
+			// Don't pursue modified objects in a cycle
+			if (!ignore.get().contains(child.getComponentId())) {
+				if (child.isDirty()) {
+					modified.add(child);
+				}
+				modified.addAll(child.getAllModifiedObjects());
+			}			
 		}
+		
+		ignore.get().remove(getComponentId());
+		
 		return modified;
 	}
 
