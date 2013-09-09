@@ -25,6 +25,7 @@ import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.policy.ExecutionResult;
 import gov.nasa.arc.mct.policy.Policy;
 import gov.nasa.arc.mct.policy.PolicyContext;
+import gov.nasa.arc.mct.scenario.component.ActivityComponent;
 import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.scenario.component.ScenarioComponent;
@@ -78,7 +79,8 @@ public class TimelineFilterViewPolicy implements Policy  {
 		
 		// Timeline view is exclusively available to Timeline objects
 		if (TimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
-			if (!(targetComponent instanceof TimelineComponent)) {
+			if (!(targetComponent instanceof TimelineComponent || 
+				  targetComponent instanceof ActivityComponent)) {
 				return new ExecutionResult(context, false, 
 						viewInfo.getViewName() + " only valid for Timeline objects.");
 			}
@@ -86,7 +88,8 @@ public class TimelineFilterViewPolicy implements Policy  {
 		
 		// After considering Scenario and Timeline views, only offer Info views for Timelines/Scenarios
 		if ((targetComponent instanceof TimelineComponent  ||
-			targetComponent instanceof ScenarioComponent) &&
+			targetComponent instanceof ScenarioComponent   ||
+			targetComponent instanceof ActivityComponent ) &&
 			(viewInfo.getViewType() == ViewType.OBJECT || viewInfo.getViewType() == ViewType.CENTER) &&
 			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
 			// Also permit Info view; unfortunately, we can't specify that class directly due to classpath
