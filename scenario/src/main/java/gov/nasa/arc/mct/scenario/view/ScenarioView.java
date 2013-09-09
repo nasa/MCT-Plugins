@@ -28,7 +28,6 @@ import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.TimelineComponent;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
-import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,7 +35,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.util.Collection;
