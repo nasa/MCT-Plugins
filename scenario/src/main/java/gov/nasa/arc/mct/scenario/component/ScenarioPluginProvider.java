@@ -22,6 +22,7 @@
 package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.policy.PolicyInfo;
+import gov.nasa.arc.mct.scenario.policy.ScenarioContainmentPolicy;
 import gov.nasa.arc.mct.scenario.policy.TimelineFilterViewPolicy;
 import gov.nasa.arc.mct.scenario.view.ScenarioView;
 import gov.nasa.arc.mct.scenario.view.TimelineInspector;
@@ -77,9 +78,13 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_scenario.png")));
 	
 	
-	private static final PolicyInfo timelinePolicy = new PolicyInfo(
+	private static final PolicyInfo timelineViewPolicy = new PolicyInfo(
 			PolicyInfo.CategoryType.FILTER_VIEW_ROLE.getKey(), 
 			TimelineFilterViewPolicy.class);
+	
+	private static final PolicyInfo containmentPolicy = new PolicyInfo(
+			PolicyInfo.CategoryType.COMPOSITION_POLICY_CATEGORY.getKey(), 
+			ScenarioContainmentPolicy.class);
 	
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
@@ -108,7 +113,7 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 	@Override
 	public Collection<PolicyInfo> getPolicyInfos() {
 		return Arrays.asList(
-				timelinePolicy
+				timelineViewPolicy, containmentPolicy
 				);
 	}
 	
