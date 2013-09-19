@@ -38,6 +38,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,6 +69,27 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 	private Color backgroundColor = Color.WHITE;
 	private View  costGraph = null;
 	private List<DurationConstraintSystem> constraints = new ArrayList<DurationConstraintSystem>();
+	
+	// Borrowed from NodeView - detect changes and merge into this view
+    private PropertyChangeListener objectStaleListener = new PropertyChangeListener() {        
+        @Override
+        public void propertyChange(java.beans.PropertyChangeEvent evt) {
+            if ((Boolean) evt.getNewValue()) {
+                if (getManifestedComponent().getComponentId() != null) {
+                    AbstractComponent committedComponent = 
+                    		PlatformAccess.getPlatform().getPersistenceProvider().getComponent(getManifestedComponent().getComponentId());
+                    // Propogate unsaved changes to the newer component
+                    boolean updated = new TimelineMergeHandler(getManifestedComponent()).update(committedComponent);
+                    setManifestedComponent(committedComponent);
+                    updateMasterDuration();
+                    rebuildUpperPanel();
+                    if (updated) {
+                    	save();
+                    }
+                }
+            }
+        }
+    };
 	
 	public TimelineView(AbstractComponent ac, ViewInfo vi) {
 		// When we are a non-embedded view, work with a fresh copy of the 
@@ -108,6 +130,8 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 				refreshAll();
 			}			
 		});
+		
+		addPropertyChangeListener(VIEW_STALE_PROPERTY, objectStaleListener);
 	}
 	
 	@Override
@@ -270,6 +294,8 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 
 		activityView.addMouseListener(controller);
 		activityView.addMouseMotionListener(controller);
+		
+		activityView.addPropertyChangeListener(VIEW_STALE_PROPERTY, objectStaleListener);
 	}
 
 	
