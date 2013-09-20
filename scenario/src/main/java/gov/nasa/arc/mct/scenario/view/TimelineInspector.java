@@ -29,6 +29,7 @@ import gov.nasa.arc.mct.gui.ViewRoleSelection;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
 import gov.nasa.arc.mct.util.LafColor;
+import gov.nasa.arc.mct.util.MCTIcons;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,6 +46,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -136,7 +138,7 @@ public class TimelineInspector extends View {
             viewTitle.setTransferHandler(null);
             content = emptyPanel;
         } else {
-            viewTitle.setIcon(view.getManifestedComponent().getIcon());
+            viewTitle.setIcon(MCTIcons.processIcon(view.getInfo().getAsset(ImageIcon.class)));
             viewTitle.setText(view.getManifestedComponent().getDisplayName() + DASH + view.getInfo().getViewName() + PANEL_SPECIFIC);
             viewTitle.setTransferHandler(new WidgetTransferHandler());
             Collection<ViewInfo> viewInfos = view.getManifestedComponent().getViewInfos(ViewType.OBJECT);

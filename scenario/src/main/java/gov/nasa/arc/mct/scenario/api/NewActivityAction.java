@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.JFrame;
@@ -51,7 +50,7 @@ public class NewActivityAction extends ContextAwareAction {
 	private static final long serialVersionUID = -2933386263765070857L;
 	private static final Logger logger = LoggerFactory.getLogger(NewActivityAction.class);
 	private Collection<View> selectedManifestations;
-	private static ResourceBundle bundle = ResourceBundle.getBundle("Bundle");
+	//private static ResourceBundle bundle = ResourceBundle.getBundle("Bundle");
     
     private String graphicsDeviceName;
 

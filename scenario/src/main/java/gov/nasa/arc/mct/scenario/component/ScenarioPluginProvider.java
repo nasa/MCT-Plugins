@@ -29,11 +29,15 @@ import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.AbstractComponentProvider;
 import gov.nasa.arc.mct.services.component.ComponentTypeInfo;
+import gov.nasa.arc.mct.services.component.CreateWizardUI;
+import gov.nasa.arc.mct.services.component.TypeInfo;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -53,29 +57,25 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			bundle.getString("display_name_activity"),  
 			bundle.getString("description_activity"), 
 			ActivityComponent.class,
-			new ActivityCreationWizardUI(),
-			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_activity.png")));
+			true);
 
 	private static final ComponentTypeInfo decisionComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_decision"),  
 			bundle.getString("description_decision"), 
 			DecisionComponent.class,
-			new DecisionCreationWizardUI(),
-			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_decision.png")));
+			true);
 
 	private static final ComponentTypeInfo timelineComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_timeline"),  
 			bundle.getString("description_timeline"), 
 			TimelineComponent.class,
-			true,
-			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_timeline.png")));
+			true);
 
 	private static final ComponentTypeInfo scenarioComponentType = new ComponentTypeInfo(
 			bundle.getString("display_name_scenario"),  
 			bundle.getString("description_scenario"), 
 			ScenarioComponent.class,
-			true,
-			new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_scenario.png")));
+			true);
 	
 	
 	private static final PolicyInfo timelineViewPolicy = new PolicyInfo(
@@ -85,6 +85,20 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 	private static final PolicyInfo containmentPolicy = new PolicyInfo(
 			PolicyInfo.CategoryType.COMPOSITION_POLICY_CATEGORY.getKey(), 
 			ScenarioContainmentPolicy.class);
+	
+	
+	private Map<Class<?>, ImageIcon> iconMap = new HashMap<Class<?>, ImageIcon>();
+	
+	public ScenarioPluginProvider() {
+		iconMap.put(ActivityComponent.class, 
+				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_activity.png")));
+		iconMap.put(DecisionComponent.class, 
+				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_decision.png")));
+		iconMap.put(TimelineComponent.class, 
+				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_timeline.png")));
+		iconMap.put(ScenarioComponent.class, 
+				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_scenario.png")));
+	}
 	
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
@@ -116,5 +130,31 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 				timelineViewPolicy, containmentPolicy
 				);
 	}
+
+	@Override
+	public <T> T getAsset(TypeInfo<?> type, Class<T> assetClass) {
+		// Create wizards
+		if (assetClass.isAssignableFrom(CreateWizardUI.class)) {
+			if (ActivityComponent.class.isAssignableFrom(type.getTypeClass())) {
+				return assetClass.cast(new ActivityCreationWizardUI());
+			}
+			if (DecisionComponent.class.isAssignableFrom(type.getTypeClass())) {
+				return assetClass.cast(new DecisionCreationWizardUI());
+			}
+		}
+		
+		// Icons
+		if (assetClass.isAssignableFrom(ImageIcon.class)) {
+			Class<?> typeClass = type.getTypeClass();
+			if (iconMap.containsKey(typeClass)) {
+				return assetClass.cast(iconMap.get(typeClass));
+			}
+		}
+	
+		// Default behavior
+		return super.getAsset(type, assetClass);
+	}
+
+
 	
 }

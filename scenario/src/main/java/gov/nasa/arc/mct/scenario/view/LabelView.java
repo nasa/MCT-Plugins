@@ -26,6 +26,7 @@ import gov.nasa.arc.mct.gui.View;
 import gov.nasa.arc.mct.gui.ViewRoleSelection;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
+import gov.nasa.arc.mct.util.MCTIcons;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,6 +37,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -59,7 +61,7 @@ public class LabelView extends View {
 	    String name = getManifestedComponent().getDisplayName();
 	    nameLabel = new JLabel(name.length() <= MAX_NAME_LENGTH ? name : name.substring(0, MAX_NAME_LENGTH - ELLIPSES.length()) + ELLIPSES);
 	    nameLabel.setToolTipText(name);
-	    final JLabel icon = new JLabel(ac.getIcon());
+	    final JLabel icon = new JLabel(MCTIcons.processIcon(ac.getAsset(ImageIcon.class)));
 	    setOpaque(false);
 	    add(icon, BorderLayout.WEST);
         add(nameLabel, BorderLayout.CENTER);

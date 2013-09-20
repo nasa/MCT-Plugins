@@ -23,7 +23,6 @@ package gov.nasa.arc.mct.scenario.view;
 
 
 import gov.nasa.arc.mct.gui.View;
-import gov.nasa.arc.mct.scenario.component.ActivityComponent;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.scenario.component.DurationConstraintSystem;
 
@@ -42,7 +41,6 @@ import java.util.Map;
 public class TimelineDurationController extends MouseAdapter {
 	private static final int MINIMUM_PIXEL_WIDTH = 4;
 	
-	private ActivityComponent parentComponent = null;
 	private DurationCapability durationCapability; 
 	private AbstractTimelineView parentView;
 	
@@ -52,7 +50,6 @@ public class TimelineDurationController extends MouseAdapter {
 	private int            initialX     = 0;
 	private long           initialStart = 0;
 	private long           initialEnd   = 0;
-	private int            priorX       = 0;
 	
 	
 	public TimelineDurationController(DurationCapability dc,
@@ -94,7 +91,6 @@ public class TimelineDurationController extends MouseAdapter {
 		if (src instanceof Component) {
 			Component comp = (Component) src;
 			initialX = e.getXOnScreen();
-			priorX = initialX;
 			initialStart = durationCapability.getStart();
 			initialEnd = durationCapability.getEnd();
 			activeHandle = handles.get(comp.getCursor().getType());
@@ -182,10 +178,6 @@ public class TimelineDurationController extends MouseAdapter {
 				((Component) src).validate();
 				((Component) src).repaint();
 			}			
-			 
-			//parentView.save();
-
-			priorX = e.getXOnScreen();
 		}
 	}
 
