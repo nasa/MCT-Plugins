@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+	<scr:component name="gov.nasa.arc.mct.satellite.component.SatelliteDataProvider"
+		immediate="true">
+		<implementation class="gov.nasa.arc.mct.satellite.component.SatelliteDataProvider" />
+		<service>
+			<provide interface="gov.nasa.arc.mct.api.feed.DataProvider" />
+		</service>
+	</scr:component>
+	<scr:component name="gov.nasa.arc.mct.satellite.SatelliteComponentProvider">
+		<implementation class="gov.nasa.arc.mct.satellite.SatelliteComponentProvider" />
+		<service>
+			<provide interface="gov.nasa.arc.mct.services.component.ComponentProvider" />
+		</service>
+	</scr:component>
+</root>

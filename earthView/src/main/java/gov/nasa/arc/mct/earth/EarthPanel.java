@@ -90,7 +90,8 @@ public class EarthPanel extends JPanel {
 			public Vector getPosition() {
 				//double t = (double) System.currentTimeMillis() / 1000.0;
 				//return new Vector(Math.sin(t), 0, Math.cos(t));
-				return new Vector(-6271, 12, 2576); //-4409.0, 2102.0, -4651.0);
+				// San Francisco, ECEF (km)
+				return new Vector(-2709.487, -4281.02, 3861.564); //-4409.0, 2102.0, -4651.0);
 			}
 
 			@Override
@@ -101,7 +102,7 @@ public class EarthPanel extends JPanel {
 			
 		};
 		Map<JComponent, Trajectory> traj = new HashMap<JComponent, Trajectory>();
-		traj.put(new JLabel("ISS"), t);
+		traj.put(new JLabel("SF"), t);
 		
 		final JFrame frame = new JFrame("test");
 		frame.getContentPane().add(new EarthPanel(traj));
@@ -171,7 +172,7 @@ public class EarthPanel extends JPanel {
 			for (Vector vec : history) {
 				p2 = transform(vec);
 				x1 = x + (int) (p1.getX() * scale / 2.0);
-				y1 = y + (int) (p1.getY() * scale / 2.0); // Screen coordinates reversed!
+				y1 = y + (int) (p1.getY() * scale / 2.0); 
 				x2 = x + (int) (p2.getX() * scale / 2.0);
 				y2 = y + (int) (p2.getY() * scale / 2.0);
 				g.setColor(p1.getZ() < 0 ? color : color.darker().darker());
@@ -320,9 +321,9 @@ public class EarthPanel extends JPanel {
 	
 	private Vector transform (Vector vec) {
 		vec = vec.multiply(1.0 / 6371.0);
-		double x = -vec.getX();
-		double y = vec.getY();
-		double z = vec.getZ();
+		double x = vec.getX();
+		double z = vec.getY();
+		double y = -vec.getZ();
 		
 		double t, u, v;
 		

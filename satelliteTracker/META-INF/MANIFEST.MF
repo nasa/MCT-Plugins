@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Example Extension Bundle
+Bundle-SymbolicName: gov.nasa.arc.mct.satelliteTracker
+Bundle-Version: 1.1.0
+Import-Package: gov.nasa.arc.mct.api.feed;version="1.1.0",
+ gov.nasa.arc.mct.components;version="1.1.0",
+ gov.nasa.arc.mct.earth.component.wizard,
+ gov.nasa.arc.mct.gui;version="1.1.0",
+ gov.nasa.arc.mct.policy;version="1.1.0",
+ gov.nasa.arc.mct.roles.events;version="1.1.0",
+ gov.nasa.arc.mct.services.activity;version="1.1.0",
+ gov.nasa.arc.mct.services.component;version="1.1.0",
+ org.osgi.framework;version="1.4.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/services.xml
+Bundle-ClassPath: .,
+ JSatTrak.jar
+Require-Bundle: gov.nasa.arc.mct

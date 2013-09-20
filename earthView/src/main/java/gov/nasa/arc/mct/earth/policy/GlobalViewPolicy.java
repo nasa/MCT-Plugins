@@ -19,10 +19,12 @@ public class GlobalViewPolicy implements Policy {
 		int c = 0;
 		
 		// Suppress for non-orbital components. This should be removed or modified if 
-		// constructing from collections generally 
+		// constructing from collections generally
+		/*
 		if (!UserOrbitalComponent.class.isAssignableFrom(component.getClass())) {
 			return false;
 		}
+		*/
 		
 		for (AbstractComponent child : component.getComponents()) {
 			for (AbstractComponent grandchild : child.getComponents()) {
