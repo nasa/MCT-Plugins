@@ -8,7 +8,6 @@ import gov.nasa.arc.mct.earth.EarthPanel;
 import gov.nasa.arc.mct.earth.EarthPanel.ViewChangeListener;
 import gov.nasa.arc.mct.earth.Trajectory;
 import gov.nasa.arc.mct.earth.Vector;
-import gov.nasa.arc.mct.earth.component.UserOrbitalComponent;
 import gov.nasa.arc.mct.gui.FeedView;
 import gov.nasa.arc.mct.gui.FeedView.RenderingCallback;
 import gov.nasa.arc.mct.roles.events.PropertyChangeEvent;

@@ -11,6 +11,7 @@ import gov.nasa.arc.mct.gui.View;
 import gov.nasa.arc.mct.gui.ViewRoleSelection;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
+import gov.nasa.arc.mct.util.MCTIcons;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -50,7 +52,7 @@ public class ReferenceView extends FeedView implements NamingContext, RenderingC
 	    String name = getManifestedComponent().getDisplayName();
 	    nameLabel = new JLabel(name.length() < 25 ? name : name.substring(0, 22) + "...");
 	    nameLabel.setToolTipText(name);
-	    final JLabel icon = new JLabel(ac.getIcon());
+	    final JLabel icon = new JLabel(MCTIcons.processIcon(ac.getAsset(ImageIcon.class)));
 	    dataLabel = new JLabel("") {
 			private static final long serialVersionUID = 2324105443468219908L;
 

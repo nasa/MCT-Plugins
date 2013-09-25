@@ -61,6 +61,7 @@ public class EarthPanel extends JPanel {
 			}
 		}
 		setLayout(new FlowLayout() {
+			private static final long serialVersionUID = -6484043113336892694L;
 			@Override
 			public Dimension minimumLayoutSize(Container parent) {
 				return new Dimension (0,0);
@@ -210,11 +211,11 @@ public class EarthPanel extends JPanel {
 	}
 	
 	
-	private void drawVessel(Graphics g, String name, int x1, int y1, int x2, int y2, Color c) {
-		g.setColor(c);
-		g.drawString(name, x1, y1);
-		g.drawLine(x1, y1, x2, y2);
-	}
+//	private void drawVessel(Graphics g, String name, int x1, int y1, int x2, int y2, Color c) {
+//		g.setColor(c);
+//		g.drawString(name, x1, y1);
+//		g.drawLine(x1, y1, x2, y2);
+//	}
 	
 	private void render(int sz) {
 		if (sz > 0) new Renderer(sz).render();
@@ -258,7 +259,6 @@ public class EarthPanel extends JPanel {
 	}
 
 	private AtomicBoolean rendering = new AtomicBoolean(false);
-	private AtomicBoolean busy      = new AtomicBoolean(false);
 	private AtomicInteger current   = new AtomicInteger(-1);
 	private class Renderer extends Thread {
 		private int sz;		

@@ -1,9 +1,0 @@
-drop table if exists component_info;
-drop table if exists database_identification;
-drop table if exists proxy_component_spec;
-drop table if exists component_discipline;
-drop table if exists component_spec;
-drop table if exists mct_users;
-drop table if exists disciplines;
-
-commit;

@@ -832,6 +832,7 @@ public class TimelineView extends View {
 			boundary = extents;// domain.getSubInterval(extents, -0.5, 1.5);
 		}
 		
+		@SuppressWarnings("unchecked")
 		public Chronology<T> castChronology(Chronology<?> chrono) {
 			return (Chronology<T>) chrono;
 		}

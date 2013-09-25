@@ -19,6 +19,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -63,7 +64,6 @@ public class NotebookPanel extends JPanel {
 		
 	/* Much of this code comes from Canvas's PanelInspector */
     private static final ImageIcon BUTTON_ICON = new ImageIcon(NotebookPanel.class.getResource("/images/infoViewButton-OFF.png"));
-    private static final ImageIcon BUTTON_PRESSED_ICON = new ImageIcon(NotebookPanel.class.getResource("/images/infoViewButton-ON.png"));
     
     private static final ImageIcon X_BUTTON_ICON = new ImageIcon(NotebookPanel.class.getResource("/images/xButton-OFF.png"));
     private static final ImageIcon X_BUTTON_PRESSED_ICON = new ImageIcon(NotebookPanel.class.getResource("/images/xButton-ON.png"));
@@ -130,9 +130,7 @@ public class NotebookPanel extends JPanel {
                 	viewPane.repaint();
                 }
             });
-            setIcon(viewInfo.getIcon() == null ? BUTTON_ICON : viewInfo.getIcon());
-            setPressedIcon(viewInfo.getIcon() == null ? BUTTON_ICON : viewInfo.getIcon());
-            setSelectedIcon(viewInfo.getSelectedIcon() == null ?  BUTTON_PRESSED_ICON : viewInfo.getSelectedIcon());
+            setIcon(viewInfo.getAsset(Icon.class) == null ? BUTTON_ICON : viewInfo.getAsset(Icon.class));
             setToolTipText(SWITCH_TO + viewInfo.getViewName());
         }        
     }

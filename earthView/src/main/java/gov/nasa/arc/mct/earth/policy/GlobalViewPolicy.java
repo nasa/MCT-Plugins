@@ -2,7 +2,6 @@ package gov.nasa.arc.mct.earth.policy;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.components.FeedProvider;
-import gov.nasa.arc.mct.earth.component.UserOrbitalComponent;
 import gov.nasa.arc.mct.earth.view.EarthView;
 import gov.nasa.arc.mct.policy.ExecutionResult;
 import gov.nasa.arc.mct.policy.Policy;

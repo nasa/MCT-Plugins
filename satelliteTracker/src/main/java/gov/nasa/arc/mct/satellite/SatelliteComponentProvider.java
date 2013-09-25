@@ -21,6 +21,7 @@
  *******************************************************************************/
 package gov.nasa.arc.mct.satellite;
 
+import gov.nasa.arc.mct.policy.PolicyInfo;
 import gov.nasa.arc.mct.satellite.component.CoordinateComponent;
 import gov.nasa.arc.mct.satellite.component.SatelliteComponent;
 import gov.nasa.arc.mct.satellite.component.VectorComponent;
@@ -29,7 +30,8 @@ import gov.nasa.arc.mct.satellite.view.MercatorProjectionView;
 import gov.nasa.arc.mct.satellite.wizard.SatelliteWizard;
 import gov.nasa.arc.mct.services.component.AbstractComponentProvider;
 import gov.nasa.arc.mct.services.component.ComponentTypeInfo;
-import gov.nasa.arc.mct.policy.PolicyInfo;
+import gov.nasa.arc.mct.services.component.CreateWizardUI;
+import gov.nasa.arc.mct.services.component.TypeInfo;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
 
@@ -60,7 +62,7 @@ public class SatelliteComponentProvider extends AbstractComponentProvider {
 	 *       represent
 	 */
 	private static final Collection<ComponentTypeInfo> COMPONENTS = Arrays.asList(
-			new ComponentTypeInfo("Satellite",   "An object to track a satellite's movement. ",        SatelliteComponent.class, new SatelliteWizard()),
+			new ComponentTypeInfo("Satellite",   "An object to track a satellite's movement. ",        SatelliteComponent.class, true),
 			new ComponentTypeInfo("Vector",  "",                 VectorComponent.class, false),
 			new ComponentTypeInfo("Coordinate", "",              CoordinateComponent.class, false)
 	);
@@ -111,6 +113,21 @@ public class SatelliteComponentProvider extends AbstractComponentProvider {
 	@Override
 	public Collection<PolicyInfo> getPolicyInfos() {
         return POLICIES;
+	}
+	
+	/*
+	 * Here is where MCT finds accessory objects for certain types. 
+	 * In this instance, MCT finds the contents of the Create Wizard 
+	 * for satellite components.
+	 */
+	@Override
+	public <T> T getAsset(TypeInfo<?> info, Class<T> assetClass) {
+		if (assetClass.isAssignableFrom(CreateWizardUI.class)) {
+			if (info.getTypeClass().isAssignableFrom(SatelliteComponent.class)) {
+				return assetClass.cast(new SatelliteWizard());
+			}
+		}
+		return super.getAsset(info, assetClass);
 	}
 	
 

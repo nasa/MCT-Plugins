@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.acme.example</groupId>
-  <name>Example MCT Plugin Bundle</name>
+  <groupId>gov.nasa.arc.mct</groupId>
+  <name>MCT Satellite Tracker</name>
   <version>${mct.platform.version}</version>
-  <artifactId>exampleplugin</artifactId>
+  <artifactId>satelliteTracker</artifactId>
   <packaging>jar</packaging>
   <description/>
   <parent>
@@ -50,8 +50,30 @@
   				</execution>
   			</executions>
   		</plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-dependency-plugin</artifactId>
+  			<executions>
+  				<execution>
+  					<id>copy-embedded-dependencies</id>
+  					<phase>compile</phase>
+  					<goals>
+  						<goal>copy-dependencies</goal>
+  					</goals>
+  					<configuration>
+  						<includeScope>system</includeScope>
+  						<includeGroupIds>name.gano</includeGroupIds>
+  						<includeArtifactIds>jSatTrack</includeArtifactIds>
+  						<excludeGroupIds>org.slf4j,gov.nasa.arc.mct,xml-apis</excludeGroupIds>
+  						<excludeArtifactIds>log4j</excludeArtifactIds>
+  						<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+  					</configuration>
+  				</execution>
+  			</executions>
+  		</plugin>  	 
   	</plugins>
   </build>
+  
   <dependencies>
   	<dependency>
   		<groupId>gov.nasa.arc.mct</groupId>
@@ -63,6 +85,13 @@
   	<artifactId>timeSequenceFeedAggregator</artifactId>
   		<version>${mct.platform.version}</version>
   		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+    	<groupId>name.gano</groupId>
+  		<artifactId>jSatTrack</artifactId>
+  		<version>4.1.4</version>
+  		<scope>system</scope>
+  		<systemPath>${project.basedir}/lib/JSatTrak.jar</systemPath>
   	</dependency>
   </dependencies>
   <properties>

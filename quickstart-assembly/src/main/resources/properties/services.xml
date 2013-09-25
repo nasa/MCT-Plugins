@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<service-configuration>
-  <service pid="gov.nasa.arc.mct.abbreviation.impl.AbbreviationService">
-    <property name="abbreviations-file" value="resources/properties/abbreviations.properties" />
-  </service>
-</service-configuration>

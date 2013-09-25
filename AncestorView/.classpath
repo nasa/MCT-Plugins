@@ -8,6 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mctcore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/platform"/>
-	<classpathentry kind="lib" path="/Users/vwoeltje/Documents/plugins2/MCT-Plugins/AncestorView/lib/prefuse.jar"/>
+	<classpathentry kind="lib" path="lib/prefuse.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

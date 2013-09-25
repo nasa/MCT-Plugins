@@ -5,7 +5,6 @@ Bundle-SymbolicName: gov.nasa.arc.mct.satelliteTracker
 Bundle-Version: 1.1.0
 Import-Package: gov.nasa.arc.mct.api.feed;version="1.1.0",
  gov.nasa.arc.mct.components;version="1.1.0",
- gov.nasa.arc.mct.earth.component.wizard,
  gov.nasa.arc.mct.gui;version="1.1.0",
  gov.nasa.arc.mct.policy;version="1.1.0",
  gov.nasa.arc.mct.roles.events;version="1.1.0",

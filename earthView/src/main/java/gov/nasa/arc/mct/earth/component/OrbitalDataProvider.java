@@ -93,9 +93,9 @@ public class OrbitalDataProvider implements DataProvider {
 		return v.normal().multiply(-0.0084);
 	}
 	
-	private static Vector drift (Vector v1, Vector v2) {
-		return new Vector (v2.getZ(), 0.0, v2.getX()).normal().multiply(0.00008);
-	}
+//	private static Vector drift (Vector v1, Vector v2) {
+//		return new Vector (v2.getZ(), 0.0, v2.getX()).normal().multiply(0.00008);
+//	}
 	
 	@Override
 	public Map<String, List<Map<String, String>>> getData(Set<String> feedIDs,

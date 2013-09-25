@@ -78,6 +78,7 @@ public class UNIXTimeTest {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSubInterval() {
 		int steps = 10;

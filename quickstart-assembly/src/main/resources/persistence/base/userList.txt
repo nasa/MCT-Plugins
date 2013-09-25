@@ -1,7 +1,0 @@
-admin admin
-testUser1	TestUsers
-testUser2	TestUsers
-testUser3	TestUsers
-testUser4	TestUsers
-testUser5	TestUsers
-testUser6	TestUsers

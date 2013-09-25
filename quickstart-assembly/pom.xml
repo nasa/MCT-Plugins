@@ -78,35 +78,6 @@
                 
 			</executions>
 		</plugin>	
-          		
-        <plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-antrun-plugin</artifactId>
-  			<version>1.3</version>
-  			<executions>
-         	 	<execution>
-  					<id>create-installer</id>
-  					<phase>install</phase>
-  					<goals>
-  						<goal>run</goal>
-  					</goals>
-  					<configuration>
-  						<tasks>
-							<ant antfile="build.xml"
-							    dir="./src/installer"
-							    inheritAll="false">
-							    <property name="build.compiler" value="extJavac" />
-								<property name="project.build.directory" location="${project.build.directory}" />
-								<property name="buildNumber" value="${buildNumber}" />
-								<property name="settings.localRepository" location="${settings.localRepository}" />
-								<property name="project.packaging" location="${project.build.directory}/${project.artifactId}-${project.version}-dist" />
-                                <property name="mct.platform.version" value="${mct.platform.version}" />
- 							</ant>
-  						</tasks>
-  					</configuration>
-  				</execution>	
-  			</executions>
-  		</plugin>
 
 
   	</plugins>  	
@@ -117,7 +88,7 @@
     <module>../notebook</module>
     <module>../chronology</module>
     <module>../earthView</module>
-    <module>../quickstartPersistence</module>
+    <module>../satelliteTracker</module>    
   </modules>
   
   <dependencies>
@@ -136,16 +107,6 @@
   	</dependency>
   	<dependency>
   		<groupId>gov.nasa.arc.mct</groupId>
-  		<artifactId>quickstartPersistence</artifactId>
-  		<version>${mct.platform.version}</version>
-  	</dependency>
-  	<dependency>
-  	    <groupId>org.codehaus.izpack</groupId>
-  	    <artifactId>izpack-standalone-compiler</artifactId>
-  	    <version>4.3.5</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>gov.nasa.arc.mct</groupId>
   		<artifactId>notebook</artifactId>
   		<version>${mct.platform.version}</version>
   	</dependency>
@@ -157,6 +118,11 @@
   	<dependency>
   		<groupId>gov.nasa.arc.mct</groupId>
   		<artifactId>chronology</artifactId>
+  		<version>${mct.platform.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>gov.nasa.arc.mct</groupId>
+  		<artifactId>satelliteTracker</artifactId>
   		<version>${mct.platform.version}</version>
   	</dependency>
 

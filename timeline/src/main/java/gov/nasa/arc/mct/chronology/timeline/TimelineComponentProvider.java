@@ -25,8 +25,8 @@ public class TimelineComponentProvider extends AbstractComponentProvider {
 
     private static final List<ViewInfo> VIEW_INFOS = Arrays.asList(
     		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, ViewType.OBJECT),
-    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.EMBEDDED, null, null, true, TimelineComponent.class),
-    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.CENTER, null, null, true, TimelineComponent.class)
+    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.EMBEDDED, true, TimelineComponent.class),
+    		new ViewInfo(TimelineView.class, TimelineView.VIEW_ROLE_NAME, TimelineView.class.getName(), ViewType.CENTER, true, TimelineComponent.class)
     		);  
 	
     private static final Collection<PolicyInfo> POLICY_INFOS = Arrays.asList(

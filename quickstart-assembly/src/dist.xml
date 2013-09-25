@@ -5,7 +5,7 @@
     
     <id>dist</id>
     <formats>
-        <format>dir</format>
+        <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <fileSets>
@@ -14,35 +14,23 @@
     		<outputDirectory></outputDirectory>
    			<includes>
    				<include>**/*</include>
-   			</includes>        
-            <excludes>
-                <exclude>**/*database*.jar</exclude>
-                <exclude>**/*mysql*.jar</exclude>
-            </excludes>    
+   			</includes>          
     		<fileMode>0777</fileMode>
     		<directoryMode>0777</directoryMode>
     	</fileSet>
 	</fileSets>
     <dependencySets>
-    	<dependencySet>
-    		<outputDirectory>resources/platform</outputDirectory>
-    		<useProjectArtifact>false</useProjectArtifact>
-    		<includes>
-    			<include>gov.nasa.arc.mct:quickstartPersistence</include>
-    			<include>org.acme.example:exampleplugin</include>	
-    		</includes>
-    		<useTransitiveDependencies>false</useTransitiveDependencies>
-    		<fileMode>0777</fileMode>
-    	</dependencySet>
         <dependencySet>
     		<outputDirectory>resources/plugins</outputDirectory>
     		<useProjectArtifact>false</useProjectArtifact>
     		<includes>
+    			<include>org.acme.example:exampleplugin</include>	
     			<include>gov.nasa.arc.mct:fastPlotViews</include>
     			<include>gov.nasa.arc.mct:chronology</include>
     			<include>gov.nasa.arc.mct:timeline</include>
                 <include>gov.nasa.arc.mct:notebook</include>
                 <include>gov.nasa.arc.mct:earthView</include>
+                <include>gov.nasa.arc.mct:satelliteTracker</include>
     		</includes>
     		<useTransitiveDependencies>false</useTransitiveDependencies>
     		<fileMode>0777</fileMode>

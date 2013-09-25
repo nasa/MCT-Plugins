@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> the type of object which describes a specific instant in the appropriate chronology  
  */
 public class TimelineLayout implements LayoutManager2 {
+	@SuppressWarnings("unused")
 	private final static Logger LOGGER = LoggerFactory.getLogger(TimelineControlPanel.class);
 	
 	private Map<Component, TimelineLayoutWeight> weights = new HashMap<Component, TimelineLayoutWeight>();
