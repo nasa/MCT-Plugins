@@ -116,7 +116,7 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 	private JComponent middlePanel;
 	private JComponent contentPane = new JPanel(new GridLayout(1,1));
 	private JComponent lowerPanel;
-	private TimelineLocalControls parent = null;
+	private TimelineLocalControls controlParent = null;
 	
 	private TimelineOverlay overlay = new TimelineOverlay();
 	private long centerTime;
@@ -154,24 +154,24 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 		this.addAncestorListener(new AncestorListener() {
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
-				updateAncestor();
+				updateAncestor(event);
 			}
 
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {
-				updateAncestor();
+				updateAncestor(event);
 			}
 
 			@Override
 			public void ancestorMoved(AncestorEvent event) {
-				updateAncestor();
+				//updateAncestor();
 			}			
 		});
 	}
 	
 	public void updateMasterDuration(DurationCapability masterDuration) {	
-		if (parent != null) {
-			parent.updateMasterDuration(masterDuration);
+		if (controlParent != null) {
+			controlParent.updateMasterDuration(masterDuration);
 		} else {
 			start = Math.min(start, masterDuration.getStart());
 			end = Math.max(end, masterDuration.getEnd());
@@ -179,17 +179,38 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 		}
 	}
 	
-	private void updateAncestor() {
-		parent = (TimelineLocalControls) 
+	private void updateAncestor(AncestorEvent event) {
+		TimelineLocalControls newParent = (TimelineLocalControls) 
 				SwingUtilities.getAncestorOfClass(TimelineLocalControls.class, this);
-		boolean isTopLevelControl = parent == null;
+		
+		// Make sure new parent is reachable after the event resolves
+		if (event.getID() == AncestorEvent.ANCESTOR_REMOVED) {
+			Container container = this.getParent();
+			while (container != newParent && container != null) {
+				if (container == event.getAncestorParent()) {
+					newParent = null;
+					break;
+				}
+				container = container.getParent();
+			}
+		}
+		
+		boolean isTopLevelControl = newParent == null;
 		upperPanel.setVisible(isTopLevelControl);
 		middlePanel.setOpaque(isTopLevelControl);
 		lowerPanel.setVisible(isTopLevelControl);
 		overlay.setVisible(false);
 		contentPane.setOpaque(isTopLevelControl);
-		if (parent != null) {
-			parent.addChangeListener(this);
+		
+		// Start listening to the new parent, if parent changed
+		if (newParent != controlParent) {
+			if (controlParent != null) {
+				controlParent.removeChangeListener(this);
+			}
+			if (newParent != null) {
+				newParent.addChangeListener(this);	
+			}
+			controlParent = newParent;
 		}
 	}
 	
@@ -296,13 +317,13 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 	
 	@Override
 	public long getStart() {
-		return parent != null ? parent.getStart() : 
+		return controlParent != null ? controlParent.getStart() : 
 			centerTime - (long) (((double) (end - start) / getZoom()) / 2.0);//masterDuration.getStart();
 	}
 
 	@Override
 	public long getEnd() {
-		return parent != null ? parent.getEnd() :
+		return controlParent != null ? controlParent.getEnd() :
 			centerTime + (long) (((double) (end - start) / getZoom()) / 2.0);//masterDuration.getStart();
 	}
 
@@ -342,15 +363,15 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 	 * @return number of pixels in a millisecond
 	 */
 	public double getPixelScale() {
-		return parent != null ?
-				parent.getPixelScale() :
+		return controlParent != null ?
+				controlParent.getPixelScale() :
 				//getZoom() * Already factored into getEnd() - getStart() below 
 				(double) (getWidth() - getLeftPadding() - getRightPadding()) / 
 				(double) (getEnd() - getStart());
 	}
 	
 	public long getTimeOffset() {
-		return parent != null ? parent.getTimeOffset() : getStart();
+		return controlParent != null ? controlParent.getTimeOffset() : getStart();
 	}
 	
 	public int getLeftPadding() {
@@ -645,6 +666,10 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 	public void addChangeListener(ChangeListener l) {
 		changeListeners.add(l);
 	}
+	
+	public void removeChangeListener(ChangeListener l) {
+		changeListeners.remove(l);
+	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
@@ -686,8 +711,8 @@ public class TimelineLocalControls extends JPanel implements DurationCapability,
 	 * @param view the view to select
 	 */
 	public void select(View view) {
-		if (parent != null && parent != this) {
-			parent.select(view);
+		if (controlParent != null && controlParent != this) {
+			controlParent.select(view);
 		} else {
 			Collection<View> oldSelections = getSelectedManifestations();
 			selectedView = view;
