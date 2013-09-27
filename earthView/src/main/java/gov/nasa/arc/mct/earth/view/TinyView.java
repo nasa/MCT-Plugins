@@ -35,19 +35,20 @@ public class TinyView extends View {
 	private JLabel nameLabel;
 	private boolean mousePressed = false;
 	
-	private static BufferedImage image = null;
+	private BufferedImage image = null;
 
 	
 	public TinyView (AbstractComponent ac, ViewInfo vi) {
 	    super(ac,vi);
 	    
-	    if (image == null) {
-	    	try {
-	    		image = ImageIO.read(getClass().getResourceAsStream("images/sat20x20.png"));
-	    	} catch (IOException ioe) {
-	    		//TODO: Log
-	    	}
-	    }
+	    try {
+    		if( ac.getDisplayName().contains("ISS"))
+    			image = ImageIO.read(getClass().getResourceAsStream("images/ISS20x20.png"));
+    		else
+    			image = ImageIO.read(getClass().getResourceAsStream("images/sat20x20.png"));
+    	} catch (IOException ioe) {
+    		//TODO: Log
+    	}
 	    
 	    setLayout(new BorderLayout());
 	    String name = getManifestedComponent().getDisplayName();
@@ -143,7 +144,7 @@ public class TinyView extends View {
 		}
 	}
 	
-	private static final Icon ICON = new Icon() {
+	private final Icon ICON = new Icon() {
 
 
 		@Override
