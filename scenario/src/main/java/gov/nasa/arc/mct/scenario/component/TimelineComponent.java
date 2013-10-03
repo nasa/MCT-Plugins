@@ -22,6 +22,7 @@
 package gov.nasa.arc.mct.scenario.component;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.components.ObjectManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +34,7 @@ import java.util.Set;
  *
  */
 public class TimelineComponent extends CostFunctionComponent implements DurationCapability {
+	private ObjectManager objectManager = new ObjectManager.ExplicitObjectManager();
 	
 	public String getDisplay(){
 		return this.getDisplayName();
@@ -43,28 +45,12 @@ public class TimelineComponent extends CostFunctionComponent implements Duration
 	protected <T> T handleGetCapability(Class<T> capability) {
 		if (capability.isAssignableFrom(getClass())) {
 			return capability.cast(this);
+		} else if (capability.isAssignableFrom(objectManager.getClass())) {
+			return capability.cast(objectManager);
 		}
 		return super.handleGetCapability(capability);
 	}
 	
-	@Override
-	public Set<AbstractComponent> getAllModifiedObjects() {
-		// Note that this is necessary to support Save All
-		// ("all modified objects" is the All in Save All;
-		//  typically, this should be all dirty children.)		
-		
-		// TODO: What about cycles?
-		Set<AbstractComponent> modified = new HashSet<AbstractComponent>();
-		for (AbstractComponent child : getComponents()) {
-			if (child.isDirty()) {
-				modified.add(child);
-			}
-			modified.addAll(child.getAllModifiedObjects());
-		}
-		return modified;
-	}
-	
-
 	@Override
 	public long getStart() {		
 		// Time is measured as "milliseconds since start of timeline", so this is always 0

@@ -38,7 +38,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,10 +67,7 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 	private Color backgroundColor = Color.WHITE;
 	private View  costGraph = null;
 	private List<DurationConstraintSystem> constraints = new ArrayList<DurationConstraintSystem>();
-	
-	// Borrowed from NodeView - detect changes and merge into this view
-    private PropertyChangeListener objectStaleListener = null;
-	
+		
 	public TimelineView(AbstractComponent ac, ViewInfo vi) {
 		// When we are a non-embedded view, work with a fresh copy of the 
 		// component direct from persistence. This ensures that we get fresh 
@@ -128,7 +124,7 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 		if (costGraph != null) {
 			costGraph.setManifestedComponent(getManifestedComponent());
 			costGraph.viewPersisted();
-		}
+		}		
 		
 		// Finally, ensure time settings are obeyed
 		refreshAll();
@@ -157,16 +153,15 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 		}		
 	}
 	
-	private void buildUpperPanel() {
-		
-		// Unregister the old listener
-		if (objectStaleListener != null) {
-			removePropertyChangeListener(objectStaleListener);
+	private void buildUpperPanel() {		
+
+		if (getStaleListener() != null) {
+			removePropertyChangeListener(getStaleListener());
+			resetStaleListener();
 		}
 		
 		// Create a new instance & attach it (will be attached to new views as well)
-		objectStaleListener = new TimelineStaleListener();
-		addPropertyChangeListener(VIEW_STALE_PROPERTY, objectStaleListener);
+		addPropertyChangeListener(VIEW_STALE_PROPERTY, getStaleListener());
 		
 		AbstractComponent ac = getManifestedComponent();
 		if (!getInfo().getViewType().equals(ViewType.EMBEDDED)) { // If we're a clone, add a view manifestation of "this"
@@ -287,7 +282,7 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 		activityView.addMouseListener(controller);
 		activityView.addMouseMotionListener(controller);
 		
-		activityView.addPropertyChangeListener(VIEW_STALE_PROPERTY, objectStaleListener);
+		activityView.addPropertyChangeListener(VIEW_STALE_PROPERTY, getStaleListener());
 	}
 
 	
@@ -309,57 +304,9 @@ public class TimelineView extends AbstractTimelineView implements TimelineContex
 		return Collections.emptySet();
 	}
 
-	/**
-	 * Since stale events may be fired by multiple components at once, 
-	 * this class executes once only (after the first execution, the 
-	 * GUI will have been rebuilt anyway.)
-	 * 
-	 * It is necessary to create a new instance of this for every 
-	 * rebuildUpperPanel due to this behavior.
-	 */
-	private class TimelineStaleListener implements PropertyChangeListener { 
-		private boolean used = false;
-
-		@Override
-		public void propertyChange(java.beans.PropertyChangeEvent evt) {
-			// Redundant updates may be sent to new views
-			// Verify object is really stale to avoid update cascade
-			Object src = evt.getSource();
-			if ((Boolean) evt.getNewValue() && 
-				src instanceof View && 
-				((View)src).getManifestedComponent().isStale() ) {
-				
-				// Similar to NodeView, get latest from persistence.
-				// Check used flag to only execute once, as after this 
-				// the view will have been remade anyway.
-				if (!used && 
-					getManifestedComponent().getComponentId() != null) {
-					// Get the latest version of the object from persistence
-					AbstractComponent committedComponent = 
-							PlatformAccess.getPlatform().getPersistenceProvider()
-							.getComponent(getManifestedComponent().getComponentId());
-
-					// For future compatibility 
-					//ObjectManager om = getManifestedComponent().getCapability(ObjectManager.class);					
-					
-					// Propagate unsaved changes to the newer component
-					boolean updated = 
-							new TimelineMergeHandler(getManifestedComponent())
-							.update(committedComponent);
-					setManifestedComponent(committedComponent);
-					updateMasterDuration();
-					rebuildUpperPanel();
-						
-					// Flag this as used - don't repeat the above for other stale notifications
-					used = true;
-					
-					// Invoke the view's "save" if there was an update, to ensure Save All remains visible
-					if (updated) {
-						save();
-					}
-				}
-				
-			}
-		}
+	@Override
+	protected void rebuild() {
+		rebuildUpperPanel();
 	}
+
 }

@@ -22,6 +22,7 @@
 package gov.nasa.arc.mct.scenario.view;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.components.ObjectManager;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class TimelineMergeHandler {
 	 * changes to a specific object and its descendants.
 	 * @param dirtyParent the object whose changes should be tracked
 	 */
-	public TimelineMergeHandler(AbstractComponent dirtyParent) {
+	public TimelineMergeHandler(ObjectManager dirtyParent) {
 		for (AbstractComponent dirtyChild : dirtyParent.getAllModifiedObjects()) {
 			DurationCapability dc = 
 					dirtyChild.getCapability(DurationCapability.class);
@@ -83,10 +84,12 @@ public class TimelineMergeHandler {
 	 * @param otherParent the component to which unsaved changes will be transferred
 	 */
 	public boolean update(AbstractComponent otherParent) {
-		return update(otherParent, new HashSet<String>());
+		AbstractComponent delegate = otherParent.getWorkUnitDelegate();
+		return update(delegate != null ? delegate : otherParent, 
+				otherParent, new HashSet<String>());
 	}
 	
-	private boolean update(AbstractComponent component, Set<String> ignore) {
+	private boolean update(AbstractComponent parent, AbstractComponent component, Set<String> ignore) {
 		boolean updated = false;
 		String id = component.getComponentId();
 		if (!ignore.contains(id)) {
@@ -109,6 +112,10 @@ public class TimelineMergeHandler {
 					}
 					// Make sure the component still appears dirty
 					component.save();
+					ObjectManager om = parent.getCapability(ObjectManager.class);
+					if (om != null) {
+						om.addModifiedObject(component);
+					}
 					// Report that we did update a component
 					updated = true;
 				}
@@ -116,7 +123,7 @@ public class TimelineMergeHandler {
 			
 			// Visit children
 			for (AbstractComponent child : component.getComponents()) {
-				updated |= update(child, ignore);
+				updated |= update(parent, child, ignore);
 			}
 		}
 		return updated;

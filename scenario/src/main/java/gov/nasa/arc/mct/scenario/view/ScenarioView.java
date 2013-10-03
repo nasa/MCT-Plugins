@@ -28,6 +28,7 @@ import gov.nasa.arc.mct.scenario.component.CostFunctionCapability;
 import gov.nasa.arc.mct.scenario.component.TimelineComponent;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
+import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -102,7 +103,7 @@ public class ScenarioView extends AbstractTimelineView {
 		
 		// Update timelines with our new children
 		for (AbstractComponent child : getManifestedComponent().getComponents()) {
-			//child.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
+			child.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
 			searchAndReplace(upperPanel, child);
 		}
 		
@@ -142,7 +143,7 @@ public class ScenarioView extends AbstractTimelineView {
 
 		for (AbstractComponent child : ac.getComponents()) {
 			if (child instanceof TimelineComponent) {
-				//child.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
+				child.getCapability(ComponentInitializer.class).setWorkUnitDelegate(getManifestedComponent());
 				upperPanel.add(createTimeline((TimelineComponent) child));
 			}
 		}
@@ -192,6 +193,19 @@ public class ScenarioView extends AbstractTimelineView {
 		});
 		
 		return container;
+	}
+
+	@Override
+	protected void rebuild() {
+		upperPanel.removeAll();
+		buildUpperPanel();
+		revalidate();
+		repaint();
+		for (Component c : upperPanel.getComponents()) {
+			c.invalidate();
+			c.validate();
+			c.repaint();
+		}
 	}
 
 	

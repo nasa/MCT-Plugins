@@ -22,13 +22,17 @@
 package gov.nasa.arc.mct.scenario.view;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.components.ObjectManager;
 import gov.nasa.arc.mct.gui.SelectionProvider;
 import gov.nasa.arc.mct.gui.View;
+import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 import gov.nasa.arc.mct.scenario.component.DurationCapability;
 import gov.nasa.arc.mct.services.component.ViewInfo;
+import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -58,6 +62,8 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 	
 	// Much start/end time behavior is deferred to the local controls
 	private TimelineLocalControls timelineContainer;
+	
+	private PropertyChangeListener staleListener = new TimelineStaleListener();
 	
 	public AbstractTimelineView(AbstractComponent ac, ViewInfo vi) {
 		super(ac,vi);
@@ -199,6 +205,104 @@ public abstract class AbstractTimelineView extends View implements ChangeListene
 		DurationCapability dc = getManifestedComponent().getCapability(DurationCapability.class);
 		if (dc != null) {
 			timelineContainer.updateMasterDuration(dc);
+		}
+	}
+	
+	/**
+	 * Rebuild when stale.
+	 */
+	protected abstract void rebuild();
+	
+	protected PropertyChangeListener getStaleListener() {
+		return staleListener;
+	}
+	
+	protected void resetStaleListener() {
+		staleListener = new TimelineStaleListener();
+	}
+	
+	/**
+	 * Since stale events may be fired by multiple components at once, 
+	 * this class executes once only (after the first execution, the 
+	 * GUI will have been rebuilt anyway.)
+	 * 
+	 * It is necessary to create a new instance of this for every 
+	 * rebuildUpperPanel due to this behavior.
+	 */
+	private class TimelineStaleListener implements PropertyChangeListener { 
+		private boolean used = false;
+
+		private boolean delegateUp(java.beans.PropertyChangeEvent evt) {
+			AbstractTimelineView parent = 
+					(AbstractTimelineView) 
+						SwingUtilities.getAncestorOfClass(
+								AbstractTimelineView.class, 
+								AbstractTimelineView.this);
+
+			// Delegate event up to parent, if there is one
+			if (parent != null) {
+				parent.getStaleListener().propertyChange(evt);
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		@Override
+		public void propertyChange(java.beans.PropertyChangeEvent evt) {
+		
+			
+			// Redundant updates may be sent to new views
+			// Verify object is really stale to avoid update cascade
+			Object src = evt.getSource();
+			if ((Boolean) evt.getNewValue() && 
+				src instanceof View && 
+				((View)src).getManifestedComponent().isStale() ) {
+				
+				// Try to delegate up, first
+				used = delegateUp(evt);
+				
+				// Similar to NodeView, get latest from persistence.
+				// Check used flag to only execute once, as after this 
+				// the view will have been remade anyway.
+				if (!used && 
+					getManifestedComponent().getComponentId() != null) {
+					// Get the latest version of the object from persistence
+					AbstractComponent committedComponent = 
+							PlatformAccess.getPlatform().getPersistenceProvider()
+							.getComponent(getManifestedComponent().getComponentId());
+					AbstractComponent workUnitDelegate =
+							getManifestedComponent().getWorkUnitDelegate();
+					ObjectManager objectManager = (workUnitDelegate == null ?
+							getManifestedComponent() : workUnitDelegate)
+							.getCapability(ObjectManager.class);
+					
+					// Copy over work unit delegate, if there was one
+					if (workUnitDelegate != null) {
+						committedComponent.getCapability(ComponentInitializer.class)
+							.setWorkUnitDelegate(workUnitDelegate);
+					}
+					
+					// Propagate unsaved changes to the newer component			
+					boolean updated = 
+							objectManager != null &&
+							new TimelineMergeHandler(objectManager).update(committedComponent);
+					
+					// Rebuild view to match what was in persistence					
+					setManifestedComponent(committedComponent);
+					rebuild();
+					updateMasterDuration();
+						
+					// Flag this as used - don't repeat the above for other stale notifications
+					used = true;
+					
+					// Invoke the view's "save" if there was an update, to ensure Save All remains visible
+					if (updated) {
+						save();
+					}
+				}
+				
+			}
 		}
 	}
 }
