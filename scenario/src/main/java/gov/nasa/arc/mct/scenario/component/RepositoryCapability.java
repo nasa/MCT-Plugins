@@ -19,25 +19,19 @@
  * MCT Licenses dialog available at runtime from the MCT Help menu for additional 
  * information. 
  *******************************************************************************/
-package gov.nasa.arc.mct.scenario;
+package gov.nasa.arc.mct.scenario.component;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-
-public class Activator implements BundleActivator {
-
+/**
+ * Exposed as a capability by objects which serve as a 
+ * central (or at least locatable) repository for other 
+ * objects, based on the capabilities exposed by those 
+ * objects. An example is the Tag Repositories, 
+ * User Tags and Mission Tags.
+ */
+public interface RepositoryCapability {
+	// All components in a repository are expected to exhibit some specific capability
+	public Class<?> getCapabilityClass();
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-	}
+	// Repositories may be specific to users, to groups, or global
+	public String getUserScope();
 }

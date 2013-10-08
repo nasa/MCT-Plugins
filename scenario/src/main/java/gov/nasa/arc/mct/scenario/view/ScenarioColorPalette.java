@@ -33,8 +33,15 @@ import java.awt.Color;
 public class ScenarioColorPalette {
 
 	private static final Color GRAPH_PALETTE[] = {
-		new Color(203, 217, 77), new Color(242, 163, 16), 
-		new Color(77, 217, 203), new Color(16, 163, 242)
+		new Color(203, 217, 77), 
+		new Color(242, 163, 16), 
+		new Color(77, 217, 203), 
+		new Color(16, 163, 242),
+		new Color(163, 16, 242),
+		new Color(242, 16, 163),
+		new Color(16, 242, 163),
+		new Color(163, 242, 16),
+		new Color(217, 77, 217)
 	};
 	
 	/**

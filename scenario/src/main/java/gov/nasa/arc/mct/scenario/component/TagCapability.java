@@ -19,25 +19,17 @@
  * MCT Licenses dialog available at runtime from the MCT Help menu for additional 
  * information. 
  *******************************************************************************/
-package gov.nasa.arc.mct.scenario;
+package gov.nasa.arc.mct.scenario.component;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import gov.nasa.arc.mct.components.AbstractComponent;
 
-public class Activator implements BundleActivator {
-
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-	}
+/**
+ * A component (such as an activity) that has been tagged 
+ * may be categorized in a certain way. This supports 
+ * summary view, which associates costs with tags.
+ *
+ */
+public interface TagCapability {
+	public String getTag();
+	public AbstractComponent getComponentRepresentation();
 }

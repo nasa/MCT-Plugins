@@ -19,25 +19,51 @@
  * MCT Licenses dialog available at runtime from the MCT Help menu for additional 
  * information. 
  *******************************************************************************/
-package gov.nasa.arc.mct.scenario;
+package gov.nasa.arc.mct.scenario.component;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import gov.nasa.arc.mct.components.AbstractComponent;
 
-public class Activator implements BundleActivator {
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * A tag component represents a type or similar, 
+ * typically associated with some activity. 
+ * @author vwoeltje
+ *
+ */
+public class TagComponent extends AbstractComponent implements TagCapability {
+	private List<TagCapability> tags = new ArrayList<TagCapability>();
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	/**
+	 * Create a new tag. 
 	 */
-	public void start(BundleContext context) throws Exception {
+	public TagComponent() {
+		tags.add(this);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <T> List<T> handleGetCapabilities(Class<T> capability) {
+		if (capability.isAssignableFrom(TagCapability.class)) {
+			return ((List<T>) tags);
+		}
+		return super.handleGetCapabilities(capability);
 	}
+
+	@Override
+	public boolean isLeaf() {
+		return true;
+	}
+
+	@Override
+	public String getTag() {
+		return getDisplayName();
+	}
+
+	@Override
+	public AbstractComponent getComponentRepresentation() {
+		return this;
+	}
+	
 }

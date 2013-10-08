@@ -21,10 +21,14 @@
  *******************************************************************************/
 package gov.nasa.arc.mct.scenario.component;
 
+import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.gui.CustomVisualControl;
+import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 import gov.nasa.arc.mct.policy.PolicyInfo;
 import gov.nasa.arc.mct.scenario.policy.ScenarioContainmentPolicy;
 import gov.nasa.arc.mct.scenario.policy.TimelineFilterViewPolicy;
 import gov.nasa.arc.mct.scenario.view.ScenarioView;
+import gov.nasa.arc.mct.scenario.view.SummaryView;
 import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.AbstractComponentProvider;
@@ -33,6 +37,7 @@ import gov.nasa.arc.mct.services.component.CreateWizardUI;
 import gov.nasa.arc.mct.services.component.TypeInfo;
 import gov.nasa.arc.mct.services.component.ViewInfo;
 import gov.nasa.arc.mct.services.component.ViewType;
+import gov.nasa.arc.mct.services.internal.component.ComponentInitializer;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,6 +82,17 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			ScenarioComponent.class,
 			true);
 	
+	private static final ComponentTypeInfo tagComponentType = new ComponentTypeInfo(
+			bundle.getString("display_name_tag"),  
+			bundle.getString("description_tag"), 
+			TagComponent.class);
+	
+	private static final ComponentTypeInfo tagRepoComponentType = new ComponentTypeInfo(
+			bundle.getString("display_name_tagrepo"),  
+			bundle.getString("description_tagrepo"), 
+			TagRepositoryComponent.class,
+			false);
+
 	
 	private static final PolicyInfo timelineViewPolicy = new PolicyInfo(
 			PolicyInfo.CategoryType.FILTER_VIEW_ROLE.getKey(), 
@@ -98,12 +114,22 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_timeline.png")));
 		iconMap.put(ScenarioComponent.class, 
 				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_scenario.png")));
+		iconMap.put(TagComponent.class, 
+				new ImageIcon(ScenarioPluginProvider.class.getResource("/icons/mct_icon_tag.png")));
+
 	}
 	
 	@Override
 	public Collection<ComponentTypeInfo> getComponentTypes() {
 		// return the component types provided
-		return Arrays.asList(activityComponentType, timelineComponentType, decisionComponentType , scenarioComponentType );
+		return Arrays.asList(
+				activityComponentType, 
+				timelineComponentType, 
+				decisionComponentType, 
+				scenarioComponentType,
+				tagComponentType,
+				tagRepoComponentType
+				);
 	}
 
 	@Override
@@ -118,7 +144,9 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 		// TimelineFilterViewPolicy will suppress these as appropriate
 		return Arrays.asList(
 			    	new ViewInfo(ScenarioView.class, "Scenario", ViewType.CENTER),
-			    	new ViewInfo(ScenarioView.class, "Scenario", ViewType.OBJECT), 
+			    	new ViewInfo(ScenarioView.class, "Scenario", ViewType.OBJECT),
+			    	new ViewInfo(SummaryView.class, "Summary", ViewType.CENTER),
+			    	new ViewInfo(SummaryView.class, "Summary", ViewType.OBJECT), 		    	
 				    new ViewInfo(TimelineView.class, "Timeline", ViewType.CENTER),
 				    new ViewInfo(TimelineInspector.class, "Timeline Inspector", ViewType.CENTER_OWNED_INSPECTOR),
 					new ViewInfo(TimelineView.class, "Timeline", ViewType.OBJECT));
@@ -151,10 +179,37 @@ public class ScenarioPluginProvider extends AbstractComponentProvider {
 			}
 		}
 	
+		// Custom editors
+		if (assetClass.isAssignableFrom(CustomVisualControl.class)) {
+			if (ActivityComponent.class.isAssignableFrom(type.getTypeClass())) {
+				return assetClass.cast(new ActivityVisualControl());
+			}
+		}
+		
 		// Default behavior
 		return super.getAsset(type, assetClass);
 	}
 
+	@Override
+	public Collection<AbstractComponent> getBootstrapComponents() {
+		String user = PlatformAccess.getPlatform().getCurrentUser().getUserId();
+		String wild = "*";
+		String prefix = bundle.getString("prefix_tagrepo");
+				
+		AbstractComponent userTags = new TagRepositoryComponent();
+		userTags.setDisplayName(bundle.getString("bdn_usertags"));
+		userTags.getCapability(ComponentInitializer.class).setId(prefix + user);
+		userTags.getCapability(ComponentInitializer.class).setCreator(user);
+		userTags.getCapability(ComponentInitializer.class).setOwner(user);
+		
+		AbstractComponent missionTags = new TagRepositoryComponent();
+		missionTags.setDisplayName(bundle.getString("bdn_missiontags"));
+		missionTags.getCapability(ComponentInitializer.class).setId(prefix + wild);
+		missionTags.getCapability(ComponentInitializer.class).setCreator(wild);
+		missionTags.getCapability(ComponentInitializer.class).setOwner(wild);
+		
+		return Arrays.asList(missionTags, userTags);
+	}
 
 	
 }

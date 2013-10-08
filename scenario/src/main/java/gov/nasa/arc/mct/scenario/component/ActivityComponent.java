@@ -21,6 +21,7 @@
  *******************************************************************************/
 package gov.nasa.arc.mct.scenario.component;
 
+import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.components.JAXBModelStatePersistence;
 import gov.nasa.arc.mct.components.ModelStatePersistence;
 import gov.nasa.arc.mct.components.ObjectManager;
@@ -55,7 +56,28 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 	public ActivityData getData() {
 		return getModel().getData();
 	}
-	
+
+	@Override
+	protected <T> List<T> handleGetCapabilities(Class<T> capability) {
+		if (capability.isAssignableFrom(TagCapability.class)) {
+			List<T> tagCapabilities = null;
+			for (AbstractComponent child : getComponents()) {
+				if (!(child instanceof ActivityComponent)) {
+					List<T> childTags = child.getCapabilities(capability);
+					if (childTags != null && !childTags.isEmpty()) {
+						if (tagCapabilities == null) {
+							tagCapabilities = new ArrayList<T>();
+						}
+						tagCapabilities.addAll(childTags);
+					}
+				}
+			}
+			if (tagCapabilities != null) {
+				return tagCapabilities;
+			}
+		}
+		return super.handleGetCapabilities(capability);
+	}
 
 	@Override
 	protected <T> T handleGetCapability(Class<T> capability) {
@@ -134,6 +156,9 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 		PropertyDescriptor notes = new PropertyDescriptor("Notes", 
 				new NotesPropertyEditor(this),  VisualControlDescriptor.TextArea);
 		notes.setFieldMutable(true);
+		PropertyDescriptor tags = new PropertyDescriptor("Tags", 
+				new TagPropertyEditor(this), VisualControlDescriptor.Custom);
+		tags.setFieldMutable(true);
 
 		fields.add(type);
 		fields.add(startTime);
@@ -142,6 +167,7 @@ public class ActivityComponent extends CostFunctionComponent implements Duration
 		fields.add(power);
 		fields.add(comm);
 		fields.add(notes);
+		fields.add(tags);
 
 		return fields;
 	}

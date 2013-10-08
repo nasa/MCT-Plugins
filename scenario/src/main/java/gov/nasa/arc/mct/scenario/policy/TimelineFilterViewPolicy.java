@@ -33,6 +33,7 @@ import gov.nasa.arc.mct.scenario.component.TimelineComponent;
 import gov.nasa.arc.mct.scenario.view.AbstractTimelineView;
 import gov.nasa.arc.mct.scenario.view.GraphView;
 import gov.nasa.arc.mct.scenario.view.ScenarioView;
+import gov.nasa.arc.mct.scenario.view.SummaryView;
 import gov.nasa.arc.mct.scenario.view.TimelineInspector;
 import gov.nasa.arc.mct.scenario.view.TimelineView;
 import gov.nasa.arc.mct.services.component.ViewInfo;
@@ -86,6 +87,17 @@ public class TimelineFilterViewPolicy implements Policy  {
 			}
 		}
 		
+		// Summary view is exclusively available to Timeline objects
+		if (SummaryView.class.isAssignableFrom(viewInfo.getViewClass())) {
+			if (!(targetComponent instanceof ScenarioComponent ||
+				  targetComponent instanceof TimelineComponent || 
+				  targetComponent instanceof ActivityComponent)) {
+				return new ExecutionResult(context, false, 
+						viewInfo.getViewName() + " only valid for Timeline objects.");
+			}
+		}
+
+		
 		// After considering Scenario and Timeline views, only offer Info views for Timelines/Scenarios
 		if ((targetComponent instanceof TimelineComponent  ||
 			targetComponent instanceof ScenarioComponent   ||
@@ -94,7 +106,8 @@ public class TimelineFilterViewPolicy implements Policy  {
 			!AbstractTimelineView.class.isAssignableFrom(viewInfo.getViewClass())) {
 			// Also permit Info view; unfortunately, we can't specify that class directly due to classpath
 			// Accept anything with "Info" in it, in case a plug-in has custom Info views
-			if (!viewInfo.getViewClass().getSimpleName().contains("Info")) {
+			if (!viewInfo.getViewClass().getSimpleName().contains("Info") &&
+				!viewInfo.getViewClass().equals(SummaryView.class)) {
 				return new ExecutionResult(context, false, 
 						"Timeline components support only Timeline views");
 			}
