@@ -28,9 +28,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -53,6 +55,7 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class TagDialog extends JDialog {    
     private static final int PADDING = 12;
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("Bundle");
     
     private JButton create = new JButton();
     private TagPanel tagPanel = new TagPanel();
@@ -64,8 +67,13 @@ public class TagDialog extends JDialog {
     public TagDialog(JComponent parent, final AbstractComponent repository) {
         super(SwingUtilities.getWindowAncestor(parent), ModalityType.DOCUMENT_MODAL);
 
+        Window parentWindow = SwingUtilities.getWindowAncestor(parent);
+        String suffix = (parentWindow instanceof Frame) ?
+        		BUNDLE.getString("wizard_title_infix") + ((Frame) parentWindow).getTitle() : 
+        		"";        
+         
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setTitle("Create Tag");
+        setTitle(BUNDLE.getString("wizard_title_tag") + suffix);
         
         JPanel controlPanel = new JPanel();
         create.addActionListener(new ActionListener() {
@@ -132,8 +140,10 @@ public class TagDialog extends JDialog {
     	private JTextField tagField = new JTextField("untitled tag");
     	
     	public TagPanel() {
+    		tagField.setColumns(30);
     		add(tagLabel);
     		add(tagField);
+    		setBorder(BorderFactory.createEmptyBorder(0, 0, 17, 0));
     	}
     	
     	public String getText() {

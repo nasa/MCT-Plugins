@@ -47,7 +47,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ComboBoxEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -57,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 /**
  * Provides the user interface for editing an activity's 
@@ -111,6 +111,7 @@ public class ActivityVisualControl extends CustomVisualControl {
 		for (AbstractComponent t : tags) {
 			tagPanel.add(new RemovableTag(t));
 		}
+		tagPanel.setVisible(tagPanel.getComponentCount() > 0);
 	}
 	
 	private void addTag(AbstractComponent tag) {
@@ -164,39 +165,18 @@ public class ActivityVisualControl extends CustomVisualControl {
 
 		JComboBox comboBox = new JComboBox(listItems.toArray());
 		
-		comboBox.setEditor(new ComboBoxEditor() {
-			private JLabel label = 
-					new JLabel(bundle.getString("visual_control_add_tag"));
-
-			@Override
-			public void addActionListener(ActionListener listener) {}
-
-			@Override
-			public Component getEditorComponent() {
-				return label;
-			}
-
-			@Override
-			public Object getItem() {
-				return label.getText();
-			}
-
-			@Override
-			public void removeActionListener(ActionListener listener) {}
-
-			@Override
-			public void selectAll() {}
-
-			@Override
-			public void setItem(Object item) {}			
-		});
- 		comboBox.setEditable(true);
+		Color border = UIManager.getColor("border");
+		comboBox.setBorder(BorderFactory.createLineBorder(border != null ? border : foreground));
 
 		comboBox.setRenderer(new ListCellRenderer() {
 			private JLabel label = new JLabel(); // Re-use
 			@Override
 			public Component getListCellRendererComponent(JList list,
 					Object item, int index, boolean isSelected, boolean hasFocus) {
+				if (index < 0) {
+					item = bundle.getString("visual_control_add_tag");
+				}
+				
 				if (item instanceof Component) {
 					return (Component) item;
 				}
@@ -216,6 +196,8 @@ public class ActivityVisualControl extends CustomVisualControl {
 					item.toString());
 				
 				label.setForeground(foreground);
+				
+				label.setOpaque(isSelected);
 				
 				return label;
 			}			
