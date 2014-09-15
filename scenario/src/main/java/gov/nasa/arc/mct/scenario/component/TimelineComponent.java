@@ -409,7 +409,8 @@ public class TimelineComponent extends CostFunctionComponent implements Duration
 					data.put(t, currentValue);
 					double commValue = commCost.getValue(t);
 					double increase = ((i < size - 1) ? commValue * (time[i + 1] - t) / SECOND_TO_MILLIS : 0.0);
-					currentValue += increase;	
+					currentValue += increase;
+					if (currentValue < 0) currentValue = 0;
 				}
 				
 				// init starting and ending point
