@@ -23,14 +23,19 @@ package gov.nasa.arc.mct.data.action;
 
 import gov.nasa.arc.mct.api.feed.BufferFullException;
 import gov.nasa.arc.mct.api.feed.FeedDataArchive;
+import gov.nasa.arc.mct.components.AbstractComponent;
+import gov.nasa.arc.mct.components.FeedProvider;
+import gov.nasa.arc.mct.components.FeedProvider.RenderingInfo;
 import gov.nasa.arc.mct.data.access.FeedDataArchiveAccess;
 import gov.nasa.arc.mct.data.component.DataComponent;
 import gov.nasa.arc.mct.data.component.DataTaxonomyComponent;
 import gov.nasa.arc.mct.platform.spi.PlatformAccess;
 
 import java.awt.Color;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,10 +45,6 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingWorker;
-
-import gov.nasa.arc.mct.components.AbstractComponent;
-import gov.nasa.arc.mct.components.FeedProvider;
-import gov.nasa.arc.mct.components.FeedProvider.RenderingInfo;
 
 /**
  * A SwingWorker responsible for managing the background 
@@ -83,7 +84,7 @@ public class DataImportWorker extends SwingWorker<Boolean, Void> {
 
 	@Override
 	protected Boolean doInBackground() throws Exception {
-		setProgress(0);		
+		setProgress(0);
 		Boolean success = readFile(file);
 		setProgress(100);
 		
@@ -104,12 +105,21 @@ public class DataImportWorker extends SwingWorker<Boolean, Void> {
 		}
 		
 		if (success) {
+			long byteLength = file.length();
+			int bytesRead = 0;
+	        long totalBytes = 0;
 			String line = fileScanner.nextLine();		
 			readFirstLine(line);
-			
+			bytesRead = line.getBytes().length;
+
 			while (success && fileScanner.hasNextLine()) {
+				
+				totalBytes += bytesRead;
+				setProgress(Math.round(((float) totalBytes / (float) byteLength) * 100f));
+
 				line = fileScanner.nextLine();
-				saveData(line);						
+				saveData(line);
+				bytesRead = line.getBytes().length;
 			}	
 			
 			// process the last line of file
@@ -188,6 +198,16 @@ public class DataImportWorker extends SwingWorker<Boolean, Void> {
 		if (fnfException != null) exceptions.add(fnfException);
 		if (bfException != null ) exceptions.add(bfException);
 	    return exceptions;
-		
 	}
+	
+	public void safeClose(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (IOException e) {
+				// Ignore
+			}
+		}
+	}
+
 }

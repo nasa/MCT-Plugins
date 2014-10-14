@@ -22,10 +22,10 @@
 package gov.nasa.arc.mct.data.action;
 
 import gov.nasa.arc.mct.components.AbstractComponent;
-import gov.nasa.arc.mct.data.component.DataTaxonomyComponent;
 import gov.nasa.arc.mct.gui.View;
 
 import java.awt.Component;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -34,6 +34,9 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for managing the import of a Data file. 
@@ -45,6 +48,8 @@ import javax.swing.ProgressMonitor;
  *
  */
 public class DataImporter {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DataImporter.class);
 	
 	/** an AWT component (for progress monitor) */
 	private Component component;
@@ -82,17 +87,20 @@ public class DataImporter {
 				BundleAccess.BUNDLE.getString("import_progress_message"), 
 				"", 0, 100);
 		
-		monitor.setMillisToDecideToPopup(200);
-		monitor.setMillisToPopup(750);
+		monitor.setMillisToDecideToPopup(10);
+		monitor.setMillisToPopup(0);
 		
 		worker.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (worker.isDone() && evt.getPropertyName().equals("state")) {
 					notifyComplete(worker);
-				} else if (monitor.isCanceled()) {
+					Toolkit.getDefaultToolkit().beep();
+				} 
+				else if (monitor.isCanceled()) {
 					worker.cancel(true);
-				} else {
+				} 
+				else {
 					monitor.setProgress(worker.getProgress());
 				} 
 			}			
@@ -116,8 +124,11 @@ public class DataImporter {
 			}
 		} catch (InterruptedException e) {
 			// Should not occur - already checked isDone
+			logger.error("Import Interrupted Error.", e);
 		} catch (ExecutionException e) {
 			// Should not occur - already checked isDone
+			logger.error("Import Execution Error.", e);
 		}
 	}
+
 }
