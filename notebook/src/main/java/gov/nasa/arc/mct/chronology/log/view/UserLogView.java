@@ -165,6 +165,7 @@ public class UserLogView extends View {
 	}
 	
 	private class EditorPanel extends JPanel implements ActionListener {
+		private static final long serialVersionUID = 1L;
 		private static final int GAP = 4;
 		private final Dimension BUTTON_SIZE = new Dimension(30, 30);
 		
