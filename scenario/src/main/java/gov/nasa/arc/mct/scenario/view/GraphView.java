@@ -194,11 +194,11 @@ public class GraphView extends AbstractTimelineView {
 			Collection<Double> dataCollection = new ArrayList<Double>();
 			
 			Map<Long, Double> values = graphData.getData(type, isInstantaneous);
-			if (values != null) {
+			if (values != null) {								
 				dataCollection = values.values();
 				timeCollection = values.keySet();
 			}
-			
+					
 			int size = timeCollection.size();						
 			if (size > 1) {
 				Double[] dataType = new Double[] {};
